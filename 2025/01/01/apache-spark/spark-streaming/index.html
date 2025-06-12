@@ -1,0 +1,965 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="唐长老">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Spark StreamingSpark Streaming 简介Spark Streaming 是 Spark 中的上一代流计算引擎，目前作为一个遗留系统，Spark 3.4.0 之后已经停止更新。如果想从零开始一个 Spark 流处理的应用，请使用 Spark Structured Streaming, todo add link   Spark Streaming 是基于 Spark RDD">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark Streaming Overview">
+<meta property="og:url" content="http://example.com/2025/01/01/apache-spark/spark-streaming/index.html">
+<meta property="og:site_name" content="唐长老的个人博客">
+<meta property="og:description" content="Spark StreamingSpark Streaming 简介Spark Streaming 是 Spark 中的上一代流计算引擎，目前作为一个遗留系统，Spark 3.4.0 之后已经停止更新。如果想从零开始一个 Spark 流处理的应用，请使用 Spark Structured Streaming, todo add link   Spark Streaming 是基于 Spark RDD">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240816/image.7sn4vpg33o.webp">
+<meta property="article:published_time" content="2025-01-01T10:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-12T06:50:37.249Z">
+<meta property="article:author" content="唐长老">
+<meta property="article:tag" content="Spark">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240816/image.7sn4vpg33o.webp">
+  
+  
+  
+  <title>Spark Streaming Overview - 唐长老的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"C9jETuLwvCO4tHwlcXW2ueCa-gzGzoHsz","app_key":"ujYxRlBDWb8IcQmRmFaoOqAi","server_url":"https://c9jetulw.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>唐长老的个人博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Spark Streaming Overview"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-01-01 10:00" pubdate>
+          2025年1月1日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          51 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Spark Streaming Overview</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Spark-Streaming"><a href="#Spark-Streaming" class="headerlink" title="Spark Streaming"></a>Spark Streaming</h1><h2 id="Spark-Streaming-简介"><a href="#Spark-Streaming-简介" class="headerlink" title="Spark Streaming 简介"></a>Spark Streaming 简介</h2><p><em>Spark Streaming 是 Spark 中的上一代流计算引擎，目前作为一个遗留系统，Spark 3.4.0 之后已经停止更新。如果想从零开始一个 Spark 流处理的应用，请使用 Spark Structured Streaming, todo add link</em>  </p>
+<p>Spark Streaming 是基于 Spark RDD API 抽象出来的流处理计算框架，核心思路是将无界的流数据按时间窗口切分成有界的数据集合，再交给 Spark 引擎对每个有界的数据集进行批处理操作。<br>因此，Spark Streaming 并不是严格意义上的基于数据流的实时计算引擎，而是基于微批的准实时计算引擎，微批之间的间隔最低为1秒左右。但即便如此，也足以应对除了对大多数秒级或分钟级近实时计算的场景。  </p>
+<p><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240816/image.7sn4vpg33o.webp" srcset="/img/loading.gif" lazyload alt="image"></p>
+<h2 id="创建-DStream"><a href="#创建-DStream" class="headerlink" title="创建 DStream"></a>创建 DStream</h2><p>DStream (Discretized Stream) 是 Spark Streaming 基于 RDD 高度抽象的离散化数据流 API，数据流可以从多种数据源获取，如 Socket、消息队列 Kafka、文件系统 HDFS&#x2F;S3 等<br>Spark Streaming 的操作都是基于 StreamingContext 的，因此需要先创建一个 sparkStreamingContext(ssc) 实例  </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">import</span> org.apache.spark._<br><span class="hljs-keyword">import</span> org.apache.spark.streaming._<br><br><span class="hljs-keyword">val</span> sparkConf = <span class="hljs-keyword">new</span> <span class="hljs-type">SparkConf</span>().setMaster(<span class="hljs-string">&quot;local[*]&quot;</span>)<br><span class="hljs-keyword">val</span> ssc = <span class="hljs-keyword">new</span> <span class="hljs-type">StreamingContext</span>(sparkConf, <span class="hljs-type">Seconds</span>(<span class="hljs-number">5</span>))<br>ssc.checkpoint(<span class="hljs-string">&quot;checkpoint&quot;</span>)<br></code></pre></td></tr></table></figure>
+<h3 id="Socket"><a href="#Socket" class="headerlink" title="Socket"></a>Socket</h3><h4 id="socketTextStream"><a href="#socketTextStream" class="headerlink" title="socketTextStream"></a>socketTextStream</h4><p>根据指定的 hostname 和 port 创建一个基于 TCP Socket 的文本数据流<br>Example: <a href="/spark-example/src/main/scala/org/exmaple/spark/sparkstreaming/SocketTextStreamExample.scala">sparkstream&#x2F;SocketTextStreamExample</a></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据  </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs stylus">$ nc -lk <span class="hljs-number">9999</span><br><span class="hljs-selector-tag">a</span><br><span class="hljs-selector-tag">b</span><br>c<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据 </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724326720000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>a<br>b<br>c<br></code></pre></td></tr></table></figure>
+
+<h4 id="socketStream"><a href="#socketStream" class="headerlink" title="socketStream"></a>socketStream</h4><p>与 <a href="#socketTextStream">socketTextStream</a> 类似，但可以支持自定义的 converter，来将字节流转换为类对象<br>Example: <a href="/spark-example/src/main/scala/org/exmaple/spark/sparkstreaming/SocketTextStreamExample.scala">sparkstream&#x2F;SocketStreamExample</a></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-comment">// define class WordCount </span><br><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">WordCount</span>(<span class="hljs-params">word: <span class="hljs-type">String</span>, count: <span class="hljs-type">Int</span></span>) <span class="hljs-keyword">extends</span> <span class="hljs-title">Serializable</span></span><br><br><span class="hljs-comment">// define custom converter</span><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">convertBytesToWords</span></span>(inputStream: <span class="hljs-type">InputStream</span>): <span class="hljs-type">Iterator</span>[<span class="hljs-type">WordCount</span>] = &#123;<br>  <span class="hljs-keyword">val</span> dataInputStream = <span class="hljs-keyword">new</span> <span class="hljs-type">BufferedReader</span>(<br>    <span class="hljs-keyword">new</span> <span class="hljs-type">InputStreamReader</span>(inputStream, <span class="hljs-string">&quot;UTF-8&quot;</span>)<br>  )<br>  <span class="hljs-keyword">val</span> linesIterator = dataInputStream.lines().iterator().asScala<br>  <span class="hljs-keyword">val</span> wordsIterator = linesIterator.flatMap(_.split(<span class="hljs-string">&quot; &quot;</span>))<br>  <span class="hljs-keyword">val</span> wordCountIterator = wordsIterator.map(<span class="hljs-keyword">new</span> <span class="hljs-type">WordCount</span>(_, <span class="hljs-number">1</span>))<br>  wordCountIterator<br>&#125;<br><br><span class="hljs-comment">// create socket stream</span><br><span class="hljs-keyword">val</span> socketWordCountDStream = ssc.socketStream[<span class="hljs-type">WordCount</span>](<br>  <span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>, convertBytesToWords, <span class="hljs-type">StorageLevel</span>.<span class="hljs-type">MEMORY_AND_DISK_SER_2</span><br>)<br>socketWordCountDStream.print()<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs llvm">$ nc -lk <span class="hljs-number">9999</span><br>a<br>b b<br><span class="hljs-keyword">c</span> <span class="hljs-keyword">c</span> <span class="hljs-keyword">c</span><br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs stylus">-------------------------------------------<br>Time: <span class="hljs-number">1724326945000</span> ms<br>-------------------------------------------<br><span class="hljs-function"><span class="hljs-title">WordCount</span><span class="hljs-params">(a,<span class="hljs-number">1</span>)</span></span><br><span class="hljs-function"><span class="hljs-title">WordCount</span><span class="hljs-params">(b,<span class="hljs-number">1</span>)</span></span><br><span class="hljs-function"><span class="hljs-title">WordCount</span><span class="hljs-params">(b,<span class="hljs-number">1</span>)</span></span><br><span class="hljs-function"><span class="hljs-title">WordCount</span><span class="hljs-params">(c,<span class="hljs-number">1</span>)</span></span><br><span class="hljs-function"><span class="hljs-title">WordCount</span><span class="hljs-params">(c,<span class="hljs-number">1</span>)</span></span><br><span class="hljs-function"><span class="hljs-title">WordCount</span><span class="hljs-params">(c,<span class="hljs-number">1</span>)</span></span><br></code></pre></td></tr></table></figure>
+
+<h3 id="消息队列"><a href="#消息队列" class="headerlink" title="消息队列"></a>消息队列</h3><p>Spark Streaming 支持与消息队列系统集成，如 Kafka 等  </p>
+<h4 id="Kafka"><a href="#Kafka" class="headerlink" title="Kafka"></a>Kafka</h4><p>根据指定的 Kafka Topic 创建一个持续消费 Kafka Message 的 DStream<br>Spark Streaming 与 Kafka 集成需要引入 <code>org.apache.spark:spark-streaming-kafka-0-10_2.12:3.5.1</code> 依赖<br>Example: <a href="/spark-example/src/main/scala/org/exmaple/spark/sparkstreaming/KafkaStreamExample.scala">sparkstream&#x2F;KafkaStreamExample</a></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">import</span> org.apache.kafka.clients.consumer.<span class="hljs-type">ConsumerRecord</span><br><span class="hljs-keyword">import</span> org.apache.kafka.common.serialization.<span class="hljs-type">StringDeserializer</span><br><span class="hljs-keyword">import</span> org.apache.spark.streaming.dstream.<span class="hljs-type">InputDStream</span><br><span class="hljs-keyword">import</span> org.apache.spark.streaming.kafka010.&#123;<span class="hljs-type">ConsumerStrategies</span>, <span class="hljs-type">KafkaUtils</span>, <span class="hljs-type">LocationStrategies</span>&#125;<br><br><span class="hljs-keyword">val</span> subscribeTopics = <span class="hljs-type">Array</span>(<span class="hljs-string">&quot;test-topic&quot;</span>)<br><span class="hljs-keyword">val</span> kafkaParams = <span class="hljs-type">Map</span>[<span class="hljs-type">String</span>, <span class="hljs-type">Object</span>](<br>  <span class="hljs-string">&quot;bootstrap.servers&quot;</span> -&gt; <span class="hljs-string">&quot;localhost:9092&quot;</span>,<br>  <span class="hljs-string">&quot;key.deserializer&quot;</span> -&gt; classOf[<span class="hljs-type">StringDeserializer</span>],<br>  <span class="hljs-string">&quot;value.deserializer&quot;</span> -&gt; classOf[<span class="hljs-type">StringDeserializer</span>],<br>  <span class="hljs-string">&quot;group.id&quot;</span> -&gt; <span class="hljs-string">&quot;test_group&quot;</span>,<br>  <span class="hljs-string">&quot;auto.offset.reset&quot;</span> -&gt; <span class="hljs-string">&quot;earliest&quot;</span>,<br>  <span class="hljs-string">&quot;enable.auto.commit&quot;</span> -&gt; <span class="hljs-string">&quot;false&quot;</span><br>)<br><br><span class="hljs-keyword">val</span> kafkaDStream: <span class="hljs-type">InputDStream</span>[<span class="hljs-type">ConsumerRecord</span>[<span class="hljs-type">String</span>, <span class="hljs-type">String</span>]] = <span class="hljs-type">KafkaUtils</span>.createDirectStream[<span class="hljs-type">String</span>, <span class="hljs-type">String</span>](<br>  ssc,<br>  <span class="hljs-type">LocationStrategies</span>.<span class="hljs-type">PreferConsistent</span>,<br>  <span class="hljs-type">ConsumerStrategies</span>.<span class="hljs-type">Subscribe</span>[<span class="hljs-type">String</span>, <span class="hljs-type">String</span>](subscribeTopics, kafkaParams)<br>)<br><br><span class="hljs-keyword">val</span> kafkaMessageDStream = kafkaDStream.map(_.value)<br><br>kafkaMessageDStream.print()<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 kafka-producer 命令往本地的 kafka 发送一些消息 </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">kafka-console-producer.sh --broker-list localhost:9092 --topic test-topic</span><br><span class="hljs-meta prompt_">&gt;</span><span class="language-bash">a</span><br><span class="hljs-meta prompt_">&gt;</span><span class="language-bash">bb</span><br><span class="hljs-meta prompt_">&gt;</span><span class="language-bash">ccc</span><br><br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724327280000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>a <br>bb<br>ccc<br></code></pre></td></tr></table></figure>
+
+<h3 id="文件系统"><a href="#文件系统" class="headerlink" title="文件系统"></a>文件系统</h3><h4 id="textFileStream"><a href="#textFileStream" class="headerlink" title="textFileStream"></a>textFileStream</h4><p>根据指定的文件系统目录创建一个 DStream，用来监控目录中的新添加的文件，并将这些新文件的每一行读取为 DStream 中的每一条记录<br>Example: <a href="/spark-example/src/main/scala/org/exmaple/spark/sparkstreaming/TextFileStreamExample.scala">sparkstream&#x2F;TextFileStreamExample</a></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> textFileStream = ssc.textFileStream(<span class="hljs-string">&quot;/tmp/spark/logs/&quot;</span>)<br>textFileStream.print()<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 Linux 命令往该目录下写入一些文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-built_in">mkdir</span> -p /tmp/spark/logs/</span><br><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;a&quot;</span> &gt; /tmp/spark/logs/a.txt</span><br><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;bbb&quot;</span> &gt; /tmp/spark/logs/b.txt</span><br><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;ccc&quot;</span> &gt; /tmp/spark/logs/c.txt</span><br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724327465000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>ccc<br>bbb<br>a<br></code></pre></td></tr></table></figure>
+<h3 id="自定义-Receiver"><a href="#自定义-Receiver" class="headerlink" title="自定义 Receiver"></a>自定义 Receiver</h3><h4 id="receiverStream"><a href="#receiverStream" class="headerlink" title="receiverStream"></a>receiverStream</h4><p>todo </p>
+<h2 id="Transformation-算子"><a href="#Transformation-算子" class="headerlink" title="Transformation 算子"></a>Transformation 算子</h2><h3 id="基本转换"><a href="#基本转换" class="headerlink" title="基本转换"></a>基本转换</h3><h4 id="map"><a href="#map" class="headerlink" title="map"></a>map</h4><p>对 DStream 中的每一条记录，根据给定的 U &#x3D;&gt; V 函数做转换操作  </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream.map(_.toUpperCase).print()<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>AAA<br>BBB<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及转换后的数据  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724327765000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>AAA<br>BBB<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724327765000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>aaa<br>bbb<br></code></pre></td></tr></table></figure>
+<h4 id="flatMap"><a href="#flatMap" class="headerlink" title="flatMap"></a>flatMap</h4><p>对 DStream 中的每一条记录，根据给定的 U &#x3D;&gt; V 函数做转换操作，同时当 V 为集合时，将集合中的元素展开成多行  </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream.flatMap(_.split(<span class="hljs-string">&quot; &quot;</span>)).print()<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs stylus">$ nc -lk <span class="hljs-number">9999</span><br><span class="hljs-selector-tag">a</span> <span class="hljs-selector-tag">a</span><br><span class="hljs-selector-tag">b</span> <span class="hljs-selector-tag">b</span> b<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及转换后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724327990000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>a a<br>b b b<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724327990000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>a<br>a<br>b<br>b<br>b<br></code></pre></td></tr></table></figure>
+<h4 id="filter"><a href="#filter" class="headerlink" title="filter"></a>filter</h4><p>对 DStream 中的每一条记录做过滤操作</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream.filter(_.length &gt;= <span class="hljs-number">2</span>).print()<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>a<br>bb<br>ccc<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及转换后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724328160000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>a<br>bb<br>ccc<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724328160000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>bb<br>ccc<br></code></pre></td></tr></table></figure>
+
+<h4 id="mapValues"><a href="#mapValues" class="headerlink" title="mapValues"></a>mapValues</h4><p>对  K-V Pair 型 DStream 中的每一条记录的 values 进行转换<br><em><strong>只能作用于 K-V Pair 型 DStream</strong></em>  </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream.map((_, <span class="hljs-number">1</span>)).mapValues(_ * <span class="hljs-number">2</span>).print()<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>a<br>b<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及转换后的数据  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724328160000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>a<br><span class="hljs-section">b</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724328160000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>(a,2)<br>(b,2)<br></code></pre></td></tr></table></figure>
+
+<h4 id="flatMapValues"><a href="#flatMapValues" class="headerlink" title="flatMapValues"></a>flatMapValues</h4><p>对 K-V Pair 型 DStream 的每一条记录中的列做转换操作，同时结果将数组中的元素展开成多行<br><em><strong>只能作用于 K-V Pair 型 DStream</strong></em>  </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream<br>  .map(line =&gt; (line, line))<br>  .flatMapValues(_.split(<span class="hljs-string">&quot; &quot;</span>).toList)<br>  .print()<br><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm">$ nc -lk <span class="hljs-number">9999</span><br><span class="hljs-built_in">a1</span> <span class="hljs-built_in">a2</span><br><span class="hljs-keyword">b1 </span><span class="hljs-keyword">b2</span><br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及转换后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724400550000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>a1 a2<br><span class="hljs-section">b1 b2</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724400550000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>(a1 a2,a1)<br>(a1 a2,a2)<br>(b1 b2,b1)<br>(b1 b2,b2)<br></code></pre></td></tr></table></figure>
+
+<h3 id="分区转换"><a href="#分区转换" class="headerlink" title="分区转换"></a>分区转换</h3><h4 id="repartition"><a href="#repartition" class="headerlink" title="repartition"></a>repartition</h4><p>将 DStream 每个批次中的 RDD 的 partition 到目标数量，对数据进行随机重新分布，会产生 Shuffle</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.foreachRDD(rdd =&gt; println(<span class="hljs-string">&quot;number of partitions before repartition: &quot;</span> + rdd.partitions.length))<br>socketTextDStream.repartition(<span class="hljs-number">10</span>).foreachRDD(rdd =&gt; println(<span class="hljs-string">&quot;number of partitions after repartition: &quot;</span> + rdd.partitions.length))<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>aa<br>bb<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出 repartition 前后的分区数</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs applescript"><span class="hljs-built_in">number</span> <span class="hljs-keyword">of</span> partitions <span class="hljs-keyword">before</span> repartition: <span class="hljs-number">2</span><br><span class="hljs-built_in">number</span> <span class="hljs-keyword">of</span> partitions <span class="hljs-keyword">after</span> repartition: <span class="hljs-number">10</span><br></code></pre></td></tr></table></figure>
+<h4 id="mapPartitions"><a href="#mapPartitions" class="headerlink" title="mapPartitions"></a>mapPartitions</h4><p>对 DStream 每个批次中的 RDD 的每一个分区做转换操作，每个分区中的元素被封装成一个迭代器，因此这个转换函数应是 iterator &#x3D;&gt; iterator 的映射</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream.mapPartitions(iter =&gt; iter.map(_.toUpperCase)).print()<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>aa<br>bb<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及转换后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724329090000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>aa<br>bb<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724329090000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>AA<br>BB<br></code></pre></td></tr></table></figure>
+
+<h3 id="聚合操作"><a href="#聚合操作" class="headerlink" title="聚合操作"></a>聚合操作</h3><h4 id="glom"><a href="#glom" class="headerlink" title="glom"></a>glom</h4><p>将 DStream 每个批次中的 RDD 的每个分区中的所有记录合并成一个 Array  </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream.glom().map(_.mkString(<span class="hljs-string">&quot;, &quot;</span>)).print()<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>aa<br>bb<br>cc<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及 glom 后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724329215000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>aa<br>bb<br>cc<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724329215000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>aa, bb<br>cc<br></code></pre></td></tr></table></figure>
+<h4 id="reduce"><a href="#reduce" class="headerlink" title="reduce"></a>reduce</h4><p>对 DStream 每个批次中的 RDD 做聚合操作  </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream.reduce(_ + _).print()<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>aa<br>bb<br>cc<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及 reduce 后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724329430000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>aa<br>bb<br>cc<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724329430000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>aabbcc<br></code></pre></td></tr></table></figure>
+<h4 id="count"><a href="#count" class="headerlink" title="count"></a>count</h4><p>对 DStream 每个批次中的 RDD 求 count </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream.count().print()<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>aa<br>bb<br>cc<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及 count 后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724329505000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>aa<br>bb<br>cc<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724329505000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>3<br></code></pre></td></tr></table></figure>
+<h4 id="countByValue"><a href="#countByValue" class="headerlink" title="countByValue"></a>countByValue</h4><p>对 DStream 每个批次中的 RDD 的每一条记录求 count   </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream.countByValue().print()<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>aa<br>aa<br>bb<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及汇总后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724329590000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>aa<br>aa<br>bb<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724329590000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>(aa,2)<br>(bb,1)<br><br></code></pre></td></tr></table></figure>
+<h4 id="groupByKey"><a href="#groupByKey" class="headerlink" title="groupByKey"></a>groupByKey</h4><p>对 K-V Pair 型 DStream 每个批次中的 RDD 按 key 进行分组, 具有相同 key 的记录会被 group 到一起<br><em><strong>只能作用于 K-V Pair 型 DStream</strong></em></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream<br>  .map(line =&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">0</span>) -&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">1</span>))<br>  .groupByKey()<br>  .print()<br><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs autohotkey">$ nc -lk <span class="hljs-number">9999</span><br><span class="hljs-built_in">a,</span>a1<br><span class="hljs-built_in">a,</span>a2<br><span class="hljs-built_in">b,</span>b1<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及汇总后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724401770000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>a,a1<br>a,a2<br><span class="hljs-section">b,b1</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724401770000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>(a,ArrayBuffer(a1, a2))<br>(b,ArrayBuffer(b1))<br></code></pre></td></tr></table></figure>
+<h4 id="reduceByKey"><a href="#reduceByKey" class="headerlink" title="reduceByKey"></a>reduceByKey</h4><p>对 K-V Pair 型 DStream 每个批次中的 RDD 按 key 进行 reduce 操作, 具有相同 key 的记录将按照用户指定的 (left, right) &#x3D;&gt; result 函数从左到右进行合并<br><em><strong>只能作用于 K-V Pair 型 DStream</strong></em></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream<br>  .map(line =&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">0</span>) -&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">1</span>))<br>  .groupByKey()<br>  .print()<br><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs autohotkey">$ nc -lk <span class="hljs-number">9999</span><br><span class="hljs-built_in">a,</span>a1<br><span class="hljs-built_in">a,</span>a2<br><span class="hljs-built_in">b,</span>b1<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及汇总后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724401885000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>a,a1<br>a,a2<br><span class="hljs-section">b,b1</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724401885000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>(a,a1a2)<br>(b,b1)<br><br></code></pre></td></tr></table></figure>
+<h4 id="combineByKey"><a href="#combineByKey" class="headerlink" title="combineByKey"></a>combineByKey</h4><p>对 DStream 每个批次中的 RDD 进行合并操作，与 <a href="spark-rdd.md#combinebykey">rdd-combineByKey</a> 行为一致，操作分两个阶段，先对单个分区内的数据聚合，再对所有分区聚合结果进行聚合，从而得到最终的聚合结果<br>它允许返回一个与 DStream 记录类型 V 不同的类型 U, 比如将元素(Int) group 成一个 List<br>同样需要两个聚合函数，以及一个用来创建初始值的函数, 这个函数的入参将是每个分区的第一个元素  </p>
+<ul>
+<li>createCombiner: V &#x3D;&gt; U, 用于创建每个分区的初始值  </li>
+<li>mergeValue: (U, V) &#x3D;&gt; U, 作用在每个分区内数据的聚合函数  </li>
+<li>mergeCombiners: (U, U) &#x3D;&gt; U, 作用在每个分区聚合结果上的聚合函数  </li>
+<li>partitioner, 用来对数据进行重分区的 partitioner, 一般无特殊要求，给 HashPartitioner 即可<br><em><strong>只能作用于 K-V Pair 型 DStream</strong></em></li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream<br>  .map(line =&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">0</span>) -&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">1</span>))<br>  .combineByKey[<span class="hljs-type">List</span>[<span class="hljs-type">String</span>]](<br>    createCombiner = (s: <span class="hljs-type">String</span>) =&gt; <span class="hljs-type">List</span>[<span class="hljs-type">String</span>](s),<br>    mergeValue = (l: <span class="hljs-type">List</span>[<span class="hljs-type">String</span>], s: <span class="hljs-type">String</span>) =&gt; l :+ s,<br>    mergeCombiner = (l1: <span class="hljs-type">List</span>[<span class="hljs-type">String</span>], l2: <span class="hljs-type">List</span>[<span class="hljs-type">String</span>]) =&gt; l1 ++ l2,<br>    partitioner = <span class="hljs-keyword">new</span> <span class="hljs-type">HashPartitioner</span>(ssc.sparkContext.defaultMinPartitions))<br>  .print()<br><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs autohotkey">$ nc -lk <span class="hljs-number">9999</span><br><span class="hljs-built_in">a,</span>a1<br><span class="hljs-built_in">a,</span>a2<br><span class="hljs-built_in">b,</span>b1<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及汇总后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724402650000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>a,a1<br>a,a2<br><span class="hljs-section">b,b1</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724402650000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>(b,List(b1))<br>(a,List(a1, a2))<br></code></pre></td></tr></table></figure>
+
+<h3 id="集合操作"><a href="#集合操作" class="headerlink" title="集合操作"></a>集合操作</h3><h4 id="union"><a href="#union" class="headerlink" title="union"></a>union</h4><p>将当前 DStream 与另一个 DStream 的数据统一起来，返回一个新的 DStream，两个 DStream 的滑动窗口间隔必须相同<br><em><strong>作用于滑动窗口时，两个滑动窗口必须有相同的滑动时间</strong></em>  </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream9999 = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br><span class="hljs-keyword">val</span> socketTextDStream9998 = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9998</span>)<br><br>socketTextDStream9999.print()<br>socketTextDStream9998.print()<br>socketTextDStream9999.union(socketTextDStream9998).print()<br><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 和 9998 端口发送一些数据</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>aa<br>bb<br><br><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9998</span><br><span class="hljs-number">11</span><br><span class="hljs-number">22</span><br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及 union 后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724328350000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>aa<br>bb<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724328350000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>11<br>22<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724328350000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>aa<br>bb<br>11<br>22<br></code></pre></td></tr></table></figure>
+<h4 id="cogroup"><a href="#cogroup" class="headerlink" title="cogroup"></a>cogroup</h4><p>将两个 DStream 每个批次中的 RDD 按 Key 关联在一起，返回关联后的 DStream，相同 Key 的 value 会被 group 到一个集合中<br><em><strong>只能作用于 K-V Pair 型 DStream</strong></em><br><em><strong>作用于滑动窗口时，两个滑动窗口必须有相同的滑动时间</strong></em>  </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream9999 = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br><span class="hljs-keyword">val</span> socketTextDStream9998 = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9998</span>)<br><br><span class="hljs-keyword">val</span> kvDStream9999 = socketTextDStream9999.map(line =&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">0</span>) -&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">1</span>))<br><span class="hljs-keyword">val</span> kvDStream9998 = socketTextDStream9998.map(line =&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">0</span>) -&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">1</span>))<br><br>socketTextDStream9999.print()<br>socketTextDStream9998.print()<br><br>kvDStream9999.cogroup(kvDStream9998).print()<br><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 和 9998 端口发送一些数据</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs autohotkey">$ nc -lk <span class="hljs-number">9999</span><br><span class="hljs-built_in">a,</span>a1<br><span class="hljs-built_in">a,</span>a2<br><span class="hljs-built_in">b,</span>b1<br><br>$ nc -lk <span class="hljs-number">9998</span><br><span class="hljs-built_in">a,</span>A1<br><span class="hljs-built_in">a,</span>A1<br><span class="hljs-built_in">b,</span>B1<br><br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及 cogroup 后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724403410000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>a,a1<br>a,a2<br><span class="hljs-section">b,b1</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724403410000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>a,A1<br>a,A1<br><span class="hljs-section">b,B1</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724403410000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>(a,(CompactBuffer(a1, a2),CompactBuffer(A1, A1)))<br>(b,(CompactBuffer(b1),CompactBuffer(B1)))<br></code></pre></td></tr></table></figure>
+
+<h4 id="join"><a href="#join" class="headerlink" title="join"></a>join</h4><p>将当前 DStream 每个批次中的 RDD 与另外的 DStream 对应批次中的 RDD 进行关联,，返回关联后的 DStream，对于重复 value，会单独出现在不同记录中<br><em><strong>只能作用于 K-V Pair 型 DStream</strong></em></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream9999 = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br><span class="hljs-keyword">val</span> socketTextDStream9998 = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9998</span>)<br><br><span class="hljs-keyword">val</span> kvDStream9999 = socketTextDStream9999.map(line =&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">0</span>) -&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">1</span>))<br><span class="hljs-keyword">val</span> kvDStream9998 = socketTextDStream9998.map(line =&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">0</span>) -&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">1</span>))<br><br>socketTextDStream9999.print()<br>socketTextDStream9998.print()<br><br>kvDStream9999.join(kvDStream9998).print()<br><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 和 9998 端口发送一些数据</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs armasm">$ nc -lk <span class="hljs-number">9999</span><br><span class="hljs-number">1</span>,a<br><span class="hljs-number">2</span>,<span class="hljs-keyword">b</span><br><br>$ nc -lk <span class="hljs-number">9998</span><br><span class="hljs-number">1</span>,A<br><span class="hljs-number">2</span>,<span class="hljs-keyword">B</span><br><span class="hljs-number">2</span>,Bb<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及 join 后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724403920000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>1,a<br><span class="hljs-section">2,b</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724403920000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>1,A<br>2,B<br><span class="hljs-section">2,Bb</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724403920000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>(2,(b,B))<br>(2,(b,Bb))<br>(1,(a,A))<br></code></pre></td></tr></table></figure>
+<h4 id="leftOuterJoin"><a href="#leftOuterJoin" class="headerlink" title="leftOuterJoin"></a>leftOuterJoin</h4><p>将当前 DStream 每个批次中的 RDD 与另外的 DStream 对应批次中的 RDD 进行左关联, 结果集中仅包含左 DStream 中的全部记录，右 DStream 中匹配不到的数据置为空<br>即对于每一条记录 (key, value_left), 能匹配到时返回 (key, (value_left, value_right)), 匹配不到时返回(key, (value_left, None))<br><em><strong>只能作用于 K-V Pair 型 DStream</strong></em><br><em><strong>作用于滑动窗口时，两个滑动窗口必须有相同的滑动时间</strong></em></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream9999 = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br><span class="hljs-keyword">val</span> socketTextDStream9998 = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9998</span>)<br><br><span class="hljs-keyword">val</span> kvDStream9999 = socketTextDStream9999.map(line =&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">0</span>) -&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">1</span>))<br><span class="hljs-keyword">val</span> kvDStream9998 = socketTextDStream9998.map(line =&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">0</span>) -&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">1</span>))<br><br>socketTextDStream9999.print()<br>socketTextDStream9998.print()<br><br>kvDStream9999.leftOuterJoin(kvDStream9998).print()<br><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 和 9998 端口发送一些数据</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm">$ nc -lk <span class="hljs-number">9999</span><br><span class="hljs-number">1</span>,a<br><span class="hljs-number">2</span>,<span class="hljs-keyword">b</span><br><span class="hljs-keyword"></span><span class="hljs-number">3</span>,c<br><br>$ nc -lk <span class="hljs-number">9998</span><br><span class="hljs-number">1</span>,A<br><span class="hljs-number">2</span>,<span class="hljs-keyword">B</span><br><span class="hljs-keyword"></span><span class="hljs-number">2</span>,<span class="hljs-keyword">Bb</span><br><span class="hljs-keyword"></span><span class="hljs-number">4</span>,D<br><br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及 leftOuterJoin 后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724404360000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>1,a<br>2,b<br><span class="hljs-section">3,c</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724404360000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>1,A<br>2,B<br>2,Bb<br><span class="hljs-section">4,D</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724404360000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>(2,(b,Some(B)))<br>(2,(b,Some(Bb)))<br>(3,(c,None))<br>(1,(a,Some(A)))<br></code></pre></td></tr></table></figure>
+<h4 id="rightOuterJoin"><a href="#rightOuterJoin" class="headerlink" title="rightOuterJoin"></a>rightOuterJoin</h4><p>将当前 DStream 每个批次中的 RDD 与另外的 DStream 对应批次中的 RDD 进行右关联, 结果集中仅包含右 DStream 中的全部记录，左 DStream 中匹配不到的数据置为空<br>即对于每一条记录 (key, value_left), 能匹配到时返回 (key, (value_left, value_right)), 匹配不到时返回(key, (None, value_right))<br><em><strong>只能作用于 K-V Pair 型 DStream</strong></em><br><em><strong>作用于滑动窗口时，两个滑动窗口必须有相同的滑动时间</strong></em></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream9999 = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br><span class="hljs-keyword">val</span> socketTextDStream9998 = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9998</span>)<br><br><span class="hljs-keyword">val</span> kvDStream9999 = socketTextDStream9999.map(line =&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">0</span>) -&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">1</span>))<br><span class="hljs-keyword">val</span> kvDStream9998 = socketTextDStream9998.map(line =&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">0</span>) -&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">1</span>))<br><br>socketTextDStream9999.print()<br>socketTextDStream9998.print()<br><br>kvDStream9999.rightOuterJoin(kvDStream9998).print()<br><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 和 9998 端口发送一些数据</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm">$ nc -lk <span class="hljs-number">9999</span><br><span class="hljs-number">1</span>,a<br><span class="hljs-number">2</span>,<span class="hljs-keyword">b</span><br><span class="hljs-keyword"></span><span class="hljs-number">3</span>,c<br><br>$ nc -lk <span class="hljs-number">9998</span><br><span class="hljs-number">1</span>,A<br><span class="hljs-number">2</span>,<span class="hljs-keyword">B</span><br><span class="hljs-keyword"></span><span class="hljs-number">2</span>,<span class="hljs-keyword">Bb</span><br><span class="hljs-keyword"></span><span class="hljs-number">4</span>,D<br><br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及 rightOuterJoin 后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724404360000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>1,a<br>2,b<br><span class="hljs-section">3,c</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724404360000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>1,A<br>2,B<br>2,Bb<br><span class="hljs-section">4,D</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724404360000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>(2,(Some(b),B))<br>(2,(Some(b),Bb))<br>(4,(None,D))<br>(1,(Some(a),A))<br></code></pre></td></tr></table></figure>
+
+<h4 id="fullOuterJoin"><a href="#fullOuterJoin" class="headerlink" title="fullOuterJoin"></a>fullOuterJoin</h4><p>将当前 DStream 每个批次中的 RDD 与另外的 DStream 对应批次中的 RDD 进行全关联, 结果集中将包含左右 RDD 中的全部记录，匹配不到的数据置为空<br>即对于每一条记录 (key, value_left), 能匹配到时返回 (key, (value_left, value_right)), 匹配不到时返回(key, (value_left, value_right)) 或 (key, (None, value_right))<br><em><strong>只能作用于 K-V Pair 型 DStream</strong></em><br><em><strong>作用于滑动窗口时，两个滑动窗口必须有相同的滑动时间</strong></em></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream9999 = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br><span class="hljs-keyword">val</span> socketTextDStream9998 = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9998</span>)<br><br><span class="hljs-keyword">val</span> kvDStream9999 = socketTextDStream9999.map(line =&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">0</span>) -&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">1</span>))<br><span class="hljs-keyword">val</span> kvDStream9998 = socketTextDStream9998.map(line =&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">0</span>) -&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">1</span>))<br><br>socketTextDStream9999.print()<br>socketTextDStream9998.print()<br><br>kvDStream9999.fullOuterJoin(kvDStream9998).print()<br><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 和 9998 端口发送一些数据</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm">$ nc -lk <span class="hljs-number">9999</span><br><span class="hljs-number">1</span>,a<br><span class="hljs-number">2</span>,<span class="hljs-keyword">b</span><br><span class="hljs-keyword"></span><span class="hljs-number">3</span>,c<br><br>$ nc -lk <span class="hljs-number">9998</span><br><span class="hljs-number">1</span>,A<br><span class="hljs-number">2</span>,<span class="hljs-keyword">B</span><br><span class="hljs-keyword"></span><span class="hljs-number">2</span>,<span class="hljs-keyword">Bb</span><br><span class="hljs-keyword"></span><span class="hljs-number">4</span>,D<br><br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及 fullOuterJoin 后的数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724404360000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>1,a<br>2,b<br><span class="hljs-section">3,c</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724404360000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>1,A<br>2,B<br>2,Bb<br><span class="hljs-section">4,D</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724404360000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>(2,(Some(b),Some(B)))<br>(2,(Some(b),Some(Bb)))<br>(3,(Some(c),None))<br>(4,(None,Some(D)))<br>(1,(Some(a),Some(A)))<br></code></pre></td></tr></table></figure>
+
+<h3 id="窗口函数"><a href="#窗口函数" class="headerlink" title="窗口函数"></a>窗口函数</h3><h4 id="window"><a href="#window" class="headerlink" title="window"></a>window</h4><p>生成一个新的 DStream，这个 DStream 以固定的时间宽度(windowDuration)以及滑动时间(slideDuration)的滑动窗口将数据聚集起来<br>滑动窗口中将包含该窗口时间宽度内的所有记录，其时间宽度和滑动时间必须是当前 DStream 的计算间隔的整数倍  </p>
+<ul>
+<li>windowDuration: 滑动窗口的时间宽度。假设其值计算间隔的两倍，那么每当滑动窗口触发时，窗口内的数据将包含当前微批以及上一个微批中的所有记录  </li>
+<li>slideDuration：滑动窗口的滑动时间。即生成新的滑动窗口的时间间隔</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br><span class="hljs-comment">// 滑动窗口时间设置为 10 s (当前计算间隔的两倍)</span><br>socketTextDStream<br>  .window(windowDuration = <span class="hljs-type">Durations</span>.seconds(<span class="hljs-number">10</span>), slideDuration = <span class="hljs-type">Durations</span>.seconds(<span class="hljs-number">5</span>))<br>  .print()<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据，其中 <code>aa</code> 和 <code>bb</code> 发完等待5秒再发 <code>cc</code> 确保他们被两个批次处理</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>aa<br>bb<br>cc<br><br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的当前微批的数据，以及滑动窗口中数据。<br>由于滑动设置为计算间隔的两倍，因此滑动窗口中将同时包含当前的微批和上一个微批中的数据  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724380055000 ms  // 第一个微批中的数据</span><br><span class="hljs-code">-------------------------------------------</span><br>aa<br>bb<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724380055000 ms  // 第一个滑动窗口中的数据。 由于上一个微批中无数据，因此当前滑动窗口中的数据等于当前微批中的数据 `aa` `bb`</span><br><span class="hljs-code">-------------------------------------------</span><br>aa<br>bb<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724380060000 ms  // 第二个微批中的数据</span><br><span class="hljs-code">-------------------------------------------</span><br>cc<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724380060000 ms  // 第二个滑动窗口中的数据。 当前滑动窗口中中包含当前微批中的数据 `cc` 与上一个微批中的数据 `aa` `bb`</span><br><span class="hljs-code">-------------------------------------------</span><br>aa<br>bb<br>cc<br><br></code></pre></td></tr></table></figure>
+<h4 id="reduceByWindow"><a href="#reduceByWindow" class="headerlink" title="reduceByWindow"></a>reduceByWindow</h4><p>对 DStream 每个滑动窗口中的 RDD 做聚合操作，相当于先对 DStream 开窗 <a href="#window">window</a>，再对每个滑动窗口进行 <a href="#reduce">reduce</a> 操作  </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream<br>  .reduceByWindow(_ + _, windowDuration = <span class="hljs-type">Durations</span>.seconds(<span class="hljs-number">10</span>), slideDuration = <span class="hljs-type">Durations</span>.seconds(<span class="hljs-number">5</span>))<br>  .print()<br><span class="hljs-comment">//socketTextDStream</span><br><span class="hljs-comment">//  .window(windowDuration = Durations.seconds(10), slideDuration = Durations.seconds(5))</span><br><span class="hljs-comment">//  .reduce(_ + _)</span><br><span class="hljs-comment">//  .print()</span><br><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据，其中 <code>aa</code> 和 <code>bb</code> 发完等待5秒再发 <code>cc</code> 确保他们被两个批次处理</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>aa<br>bb<br>cc<br><br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的当前微批的数据，以及滑动窗口中的聚合数据   </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724395980000 ms  // 第一个微批中的数据</span><br><span class="hljs-code">-------------------------------------------</span><br>aa<br>bb<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724395980000 ms  // 第一个滑动窗口中的数据</span><br><span class="hljs-code">-------------------------------------------</span><br>aabb<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724395985000 ms  // 第二个微批中的数据</span><br><span class="hljs-code">-------------------------------------------</span><br>cc<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724395985000 ms  // 第二个滑动窗口中的数据</span><br><span class="hljs-code">-------------------------------------------</span><br>aabbcc<br><br></code></pre></td></tr></table></figure>
+<h4 id="countByWindow"><a href="#countByWindow" class="headerlink" title="countByWindow"></a>countByWindow</h4><p>对 DStream 每个窗口中的 RDD 求 count，相当于先对 DStream 开窗 <a href="#window">window</a>，再对每个滑动窗口进行 <a href="#count">count</a> 操作</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream<br>  .countByWindow(windowDuration = <span class="hljs-type">Durations</span>.seconds(<span class="hljs-number">10</span>), slideDuration = <span class="hljs-type">Durations</span>.seconds(<span class="hljs-number">5</span>))<br>  .print()<br><span class="hljs-comment">//socketTextDStream</span><br><span class="hljs-comment">//  .window(windowDuration = Durations.seconds(10), slideDuration = Durations.seconds(5))</span><br><span class="hljs-comment">//  .count()</span><br><span class="hljs-comment">//  .print()</span><br><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据，其中 <code>aa</code> 和 <code>bb</code> 发完等待5秒再发 <code>cc</code> 确保他们被两个批次处理</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>aa<br>bb<br>cc<br><br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的当前微批的数据，以及滑动窗口中的聚合数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724395980000 ms  // 第一个微批中的数据</span><br><span class="hljs-code">-------------------------------------------</span><br>aa<br>bb<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724395980000 ms  // 第一个滑动窗口中的数据</span><br><span class="hljs-code">-------------------------------------------</span><br>2<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724395985000 ms  // 第二个微批中的数据</span><br><span class="hljs-code">-------------------------------------------</span><br>cc<br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724395985000 ms  // 第二个滑动窗口中的数据</span><br><span class="hljs-code">-------------------------------------------</span><br>3<br><br></code></pre></td></tr></table></figure>
+<h4 id="groupByKeyAndWindow"><a href="#groupByKeyAndWindow" class="headerlink" title="groupByKeyAndWindow"></a>groupByKeyAndWindow</h4><p>对 DStream 每个滑动窗口中的 RDD 按 Key 做聚合操作，相当于先对 DStream 开窗 <a href="#window">window</a>，再对每个滑动窗口进行 <a href="#groupByKey">groupByKey</a> 操作<br><em><strong>只能作用于 K-V Pair 型 DStream</strong></em></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream<br>  .map(line =&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">0</span>) -&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">1</span>))<br>  .groupByKeyAndWindow(windowDuration = <span class="hljs-type">Durations</span>.seconds(<span class="hljs-number">10</span>), slideDuration = <span class="hljs-type">Durations</span>.seconds(<span class="hljs-number">5</span>))<br>  .print()<br><span class="hljs-comment">//socketTextDStream</span><br><span class="hljs-comment">//  .map(line =&gt; line.split(&quot;,&quot;)(0) -&gt; line.split(&quot;,&quot;)(1))</span><br><span class="hljs-comment">//  .window(windowDuration = Durations.seconds(10), slideDuration = Durations.seconds(5))</span><br><span class="hljs-comment">//  .reduceByKey(_ + _)</span><br><span class="hljs-comment">//  .print()</span><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据，其中 <code>a,a1</code> 和 <code>a,a2</code> 发完等待5秒再发 <code>b,b1</code> 确保他们被两个批次处理</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs autohotkey">$ nc -lk <span class="hljs-number">9999</span><br><span class="hljs-built_in">a,</span>a1<br><span class="hljs-built_in">a,</span>a2<br><span class="hljs-built_in">b,</span>b1<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的当前微批的数据，以及滑动窗口中的聚合数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724405275000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>a,a1<br><span class="hljs-section">a,a2</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724405275000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">(a,ArrayBuffer(a1, a2))</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724405280000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">b,b1</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724405280000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>(a,ArrayBuffer(a1, a2))<br>(b,ArrayBuffer(b1))<br></code></pre></td></tr></table></figure>
+<h4 id="reduceByKeyAndWindow"><a href="#reduceByKeyAndWindow" class="headerlink" title="reduceByKeyAndWindow"></a>reduceByKeyAndWindow</h4><p>对 DStream 每个滑动窗口中的 RDD 按 Key 做聚合操作，相当于先对 DStream 开窗 <a href="#window">window</a>，再对每个滑动窗口进行 <a href="#reduceByKey">reduceByKey</a> 操作</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream<br>  .map(line =&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">0</span>) -&gt; line.split(<span class="hljs-string">&quot;,&quot;</span>)(<span class="hljs-number">1</span>))<br>  .reduceByKeyAndWindow(_ + _, windowDuration = <span class="hljs-type">Durations</span>.seconds(<span class="hljs-number">10</span>), slideDuration = <span class="hljs-type">Durations</span>.seconds(<span class="hljs-number">5</span>))<br>  .print()<br><span class="hljs-comment">//socketTextDStream</span><br><span class="hljs-comment">//  .map(line =&gt; line.split(&quot;,&quot;)(0) -&gt; line.split(&quot;,&quot;)(1))</span><br><span class="hljs-comment">//  .window(windowDuration = Durations.seconds(10), slideDuration = Durations.seconds(5))</span><br><span class="hljs-comment">//  .reduceByKey(_ + _)</span><br><span class="hljs-comment">//  .print()</span><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据，其中 <code>a,a1</code> 和 <code>a,a2</code> 发完等待5秒再发 <code>b,b1</code> 确保他们被两个批次处理</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs autohotkey">$ nc -lk <span class="hljs-number">9999</span><br><span class="hljs-built_in">a,</span>a1<br><span class="hljs-built_in">a,</span>a2<br><span class="hljs-built_in">b,</span>b1<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的当前微批的数据，以及滑动窗口中的聚合数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724405005000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>a,a1<br><span class="hljs-section">a,a2</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724405005000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">(a,a1a2)</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724405010000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">b,b1</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724405010000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>(a,a1a2)<br>(b,b1)<br></code></pre></td></tr></table></figure>
+
+<h4 id="slice"><a href="#slice" class="headerlink" title="slice"></a>slice</h4><h3 id="状态算子"><a href="#状态算子" class="headerlink" title="状态算子"></a>状态算子</h3><h4 id="updateStateByKey"><a href="#updateStateByKey" class="headerlink" title="updateStateByKey"></a>updateStateByKey</h4><p>维护 DStream 的 Key 的全局状态，根据指定的 (values: scala.collection.Seq[U], state: Option[V]) &#x3D;&gt; Option(V) 函数 进行状态更新<br>每个批次中相同 Key 的 value 将被 group 成 values，当前 Key 的状态为 state<br><em><strong>只能作用于 K-V Pair 型 DStream</strong></em></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br><span class="hljs-keyword">val</span> tatalCountByKey: (<span class="hljs-type">Seq</span>[<span class="hljs-type">Int</span>], <span class="hljs-type">Option</span>[<span class="hljs-type">Int</span>]) =&gt; <span class="hljs-type">Option</span>[<span class="hljs-type">Int</span>] = (values: <span class="hljs-type">Seq</span>[<span class="hljs-type">Int</span>], state: <span class="hljs-type">Option</span>[<span class="hljs-type">Int</span>]) =&gt; &#123;<br>  <span class="hljs-type">Some</span>(values.sum + state.getOrElse(<span class="hljs-number">0</span>))<br>&#125;<br>socketTextDStream.print()<br>socketTextDStream<br>  .flatMap(_.split(<span class="hljs-string">&quot; &quot;</span>)).map((_, <span class="hljs-number">1</span>))<br>  .updateStateByKey(tatalCountByKey)<br>  .print()<br><br><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据，其中 <code>a</code> 和 <code>b</code> 发完等待5秒再发 <code>a a</code> 和 <code>b b</code> 确保他们被两个批次处理</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">$ nc -lk <span class="hljs-number">9999</span><br><span class="hljs-selector-tag">a</span><br><span class="hljs-selector-tag">b</span> <br><span class="hljs-selector-tag">a</span> <span class="hljs-selector-tag">a</span><br><span class="hljs-selector-tag">b</span> <span class="hljs-selector-tag">b</span> <br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及更新后的状态数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724409375000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>a<br><span class="hljs-section">b </span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724409375000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>(a,1)<br><span class="hljs-section">(b,1)</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724409380000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>a a<br><span class="hljs-section">b b </span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724409380000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>(a,3)<br>(b,3)<br></code></pre></td></tr></table></figure>
+<h4 id="mapWithState"><a href="#mapWithState" class="headerlink" title="mapWithState"></a>mapWithState</h4><p>维护 DStream 的 Key 的全局状态，根据指定的  (Time, String, Option[U], State[U]) &#x3D;&gt; Some[V] 函数 进行状态更新<br>每个批次中每个 Key 的每条记录，以及每个 Key 的当前状态都将作为参数传入函数进行计算，可根据 State 的 <code>exists</code>, <code>get</code>, <code>update</code> 等方法来维护状态<br><em><strong>只能作用于 K-V Pair 型 DStream</strong></em></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br><br><span class="hljs-keyword">val</span> totalCountByKey: (<span class="hljs-type">Time</span>, <span class="hljs-type">String</span>, <span class="hljs-type">Option</span>[<span class="hljs-type">Int</span>], <span class="hljs-type">State</span>[<span class="hljs-type">Int</span>]) =&gt; <span class="hljs-type">Some</span>[(<span class="hljs-type">String</span>, <span class="hljs-type">Int</span>)] = (time: <span class="hljs-type">Time</span>, key: <span class="hljs-type">String</span>, value: <span class="hljs-type">Option</span>[<span class="hljs-type">Int</span>], state: <span class="hljs-type">State</span>[<span class="hljs-type">Int</span>]) =&gt; &#123;<br>  <span class="hljs-keyword">if</span> (!state.exists())<br>    state.update(<span class="hljs-number">0</span>)<br>  <span class="hljs-keyword">else</span> &#123;<br>    state.update(state.get() + value.getOrElse(<span class="hljs-number">0</span>))<br>  &#125;<br>  <span class="hljs-type">Some</span>(&#123;key -&gt; state.get()&#125;)<br>&#125;<br><br>socketTextDStream.print()<br>socketTextDStream<br>  .flatMap(_.split(<span class="hljs-string">&quot; &quot;</span>)).map((_, <span class="hljs-number">1</span>))<br>  .mapWithState(<span class="hljs-type">StateSpec</span>.function(totalCountByKey))<br>  .print()<br><br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据，其中 <code>a</code> 和 <code>b</code> 发完等待5秒再发 <code>a a</code> 和 <code>b b</code> 确保他们被两个批次处理</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">$ nc -lk <span class="hljs-number">9999</span><br><span class="hljs-selector-tag">a</span><br><span class="hljs-selector-tag">b</span> <br><span class="hljs-selector-tag">a</span> <span class="hljs-selector-tag">a</span><br><span class="hljs-selector-tag">b</span> <span class="hljs-selector-tag">b</span> <br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出从 socket 接收到的数据，以及更新后的状态数据</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724410525000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>a<br>b <br><br><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724410525000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>(a,1)<br><span class="hljs-section">(b,1)</span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724410530000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>a a<br><span class="hljs-section">b b </span><br><span class="hljs-section">-------------------------------------------</span><br><span class="hljs-section">Time: 1724410530000 ms</span><br><span class="hljs-section">-------------------------------------------</span><br>(a,2)<br>(a,3)<br>(b,2)<br>(b,3)<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="Action-算子"><a href="#Action-算子" class="headerlink" title="Action 算子"></a>Action 算子</h2><h3 id="转换为-Java-集合"><a href="#转换为-Java-集合" class="headerlink" title="转换为 Java 集合"></a>转换为 Java 集合</h3><h4 id="foreachRDD"><a href="#foreachRDD" class="headerlink" title="foreachRDD"></a>foreachRDD</h4><p>对 DStream 每个批次中的 RDD 做遍历操作，可以将 RDD 输出到控制台或写入外部系统等操作，返回 Unit 类型即无返回值  </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.foreachRDD(rdd =&gt; rdd.foreach(println(_)))<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>aa<br>bb<br>cc<br><br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出每个批次中的 RDD 的每一条记录</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724415010000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>(a,a1a2)<br>(b,b1)<br><br></code></pre></td></tr></table></figure>
+<h4 id="print"><a href="#print" class="headerlink" title="print"></a>print</h4><p>将 DStream 每个批次中的 RDD 的前 10 条记录输出到控制台  </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>aa<br>bb<br>cc<br><br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出每个批次中的 RDD 的每一条记录</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724415010000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>aa<br>bb<br>cc<br></code></pre></td></tr></table></figure>
+
+<h3 id="输出到外部系统"><a href="#输出到外部系统" class="headerlink" title="输出到外部系统"></a>输出到外部系统</h3><h4 id="saveAsTextFiles"><a href="#saveAsTextFiles" class="headerlink" title="saveAsTextFiles"></a>saveAsTextFiles</h4><p>将 DStream 每个批次中的 RDD 以 TEXT 文件格式写入 Hadoop 支持的外部文件系统<br>每个批次都会写一个新的文件目录以及相应的数据文件，因此长时间运行的流任务将产生很多的小文件  </p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs scala"><span class="hljs-keyword">val</span> socketTextDStream = ssc.socketTextStream(<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-number">9999</span>)<br>socketTextDStream.print()<br>socketTextDStream.saveAsTextFiles(<span class="hljs-string">&quot;/tmp/spark/output/socket_data&quot;</span>)<br></code></pre></td></tr></table></figure>
+<p>启动程序后，使用 netcat 命令往本机的 9999 端口发送一些数据</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>nc -lk <span class="hljs-number">9999</span><br>aa<br>bb<br>cc<br></code></pre></td></tr></table></figure>
+<p>Spark Streaming 任务的控制台将打印出每个批次中的 RDD 的每一条记录</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc"><span class="hljs-code">-------------------------------------------</span><br><span class="hljs-code">Time: 1724653405000 ms</span><br><span class="hljs-code">-------------------------------------------</span><br>aa<br>bb<br>c<br></code></pre></td></tr></table></figure>
+<p>并且会将每个批次中的数据写入指定的路径中  </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-built_in">cat</span> /tmp/spark/output/socket_data-1724653405000/*</span><br>aa<br>bb<br>c<br></code></pre></td></tr></table></figure>
+<h4 id="saveAsObjectFiles"><a href="#saveAsObjectFiles" class="headerlink" title="saveAsObjectFiles"></a>saveAsObjectFiles</h4><p>将 DStream 每个批次中的 RDD 序列化之后，以 Hadoop SequenceFile 文件格式写入 Hadoop 支持的外部文件系统</p>
+<h2 id="控制算子"><a href="#控制算子" class="headerlink" title="控制算子"></a>控制算子</h2><h3 id="persist"><a href="#persist" class="headerlink" title="persist"></a>persist</h3><p>将 DStream 每个批次中的 RDD 缓存到内存或者磁盘中，提升作业性能</p>
+<h3 id="cache"><a href="#cache" class="headerlink" title="cache"></a>cache</h3><p>等同于缓存级别为 <code>MEMORY_ONLY_SER</code> 的 <a href="#persist">persist</a></p>
+<h3 id="checkpoint"><a href="#checkpoint" class="headerlink" title="checkpoint"></a>checkpoint</h3><p>将当前的 DStream 按设置的间隔保存在设置的 checkpointDir 中，当程序重启时，将从最新 checkpoint 处继续运行 </p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Spark/" class="category-chain-item">Spark</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Spark/" class="print-no-link">#Spark</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Spark Streaming Overview</div>
+      <div>http://example.com/2025/01/01/apache-spark/spark-streaming/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>唐长老</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年1月1日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/01/01/apache-spark/spark-rdd-transformation-partition-transform/" title="Spark RDD - Transformation 算子 - 分区转换">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Spark RDD - Transformation 算子 - 分区转换</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"C9jETuLwvCO4tHwlcXW2ueCa-gzGzoHsz","appKey":"ujYxRlBDWb8IcQmRmFaoOqAi","path":"window.location.pathname","placeholder":"写留言","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

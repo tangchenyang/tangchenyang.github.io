@@ -1,0 +1,787 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="唐长老">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Spark RDD - Action 算子转换为内存集合reduce对 RDD 进行 reduce 操作, 所有记录按照用户指定的 (left, right) &#x3D;&gt; result 函数从左到右进行合并, 返回一个 Java 集合 12345scala&gt; val rdd &#x3D; sc.parallelize(1 to 6)rdd: org.apache.spark.rdd.RDD[">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark RDD - Action 算子">
+<meta property="og:url" content="http://example.com/2025/01/01/apache-spark/spark-rdd-action/index.html">
+<meta property="og:site_name" content="唐长老的个人博客">
+<meta property="og:description" content="Spark RDD - Action 算子转换为内存集合reduce对 RDD 进行 reduce 操作, 所有记录按照用户指定的 (left, right) &#x3D;&gt; result 函数从左到右进行合并, 返回一个 Java 集合 12345scala&gt; val rdd &#x3D; sc.parallelize(1 to 6)rdd: org.apache.spark.rdd.RDD[">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-01-01T10:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-12T06:50:37.248Z">
+<meta property="article:author" content="唐长老">
+<meta property="article:tag" content="Spark">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>Spark RDD - Action 算子 - 唐长老的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"C9jETuLwvCO4tHwlcXW2ueCa-gzGzoHsz","app_key":"ujYxRlBDWb8IcQmRmFaoOqAi","server_url":"https://c9jetulw.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>唐长老的个人博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Spark RDD - Action 算子"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-01-01 10:00" pubdate>
+          2025年1月1日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          16 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Spark RDD - Action 算子</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Spark-RDD-Action-算子"><a href="#Spark-RDD-Action-算子" class="headerlink" title="Spark RDD - Action 算子"></a>Spark RDD - Action 算子</h1><h2 id="转换为内存集合"><a href="#转换为内存集合" class="headerlink" title="转换为内存集合"></a>转换为内存集合</h2><h3 id="reduce"><a href="#reduce" class="headerlink" title="reduce"></a>reduce</h3><p>对 RDD 进行 reduce 操作, 所有记录按照用户指定的 (left, right) &#x3D;&gt; result 函数从左到右进行合并, 返回一个 Java 集合</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[Int]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.reduce</span>(_ + _)<br>res0: Int = <span class="hljs-number">21</span><br></code></pre></td></tr></table></figure>
+<h3 id="treeReduce"><a href="#treeReduce" class="headerlink" title="treeReduce"></a>treeReduce</h3><p>语义上与 <a href="#reduce">reduce</a> 等价 ，只是在合并结果时，treeAggregate 将以多级树的形式逐级聚合，降低 Driver 端的压力  </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[Int]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.treeReduce</span>(_ + _, depth=<span class="hljs-number">2</span>)<br>res0: Int = <span class="hljs-number">21</span><br></code></pre></td></tr></table></figure>
+<h3 id="fold"><a href="#fold" class="headerlink" title="fold"></a>fold</h3><p>对 RDD 进行合并操作, 所有记录按照用户指定的 (left, right) &#x3D;&gt; result 函数从左到右进行合并, 返回一个 Java 集合<br>与 <a href="#reduce">reduce</a> 的功能很相似，不同的是 fold 允许用户提供一个作用于每个分区的初始值</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[Int]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.fold</span>(<span class="hljs-number">0</span>)(_ + _)<br>res0: Int = <span class="hljs-number">21</span><br></code></pre></td></tr></table></figure>
+<h3 id="aggregate"><a href="#aggregate" class="headerlink" title="aggregate"></a>aggregate</h3><p>对 RDD 进行聚合操作，与 <a href="#aggregateByKey">aggregateByKey</a> 算子类似，只是面向 RDD 的所有记录，而非以 Key 为单位。<br>操作分两个阶段，先对单个分区内的数据聚合，再对所有分区聚合结果进行聚合，从而得到最终的聚合结果,<br>它允许返回一个与 RDD 记录类型 V 不同的类型 U, 比如将元素(Int) group 成一个 List<br>因此需要指定一个初始值，和两个聚合函数  </p>
+<ul>
+<li>zeroValue: U, 作用在每个分区的初始值  </li>
+<li>seqOp: (U, V) &#x3D;&gt; U, 作用在每个分区内数据的聚合函数  </li>
+<li>combOp: (U, U) &#x3D;&gt; U, 作用在每个分区聚合结果上的聚合函数</li>
+</ul>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[Int]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.aggregate</span>(<span class="hljs-number">0</span>)(_+_, _+_)<br>res0: Int = <span class="hljs-number">21</span><br></code></pre></td></tr></table></figure>
+<h3 id="treeAggregate"><a href="#treeAggregate" class="headerlink" title="treeAggregate"></a>treeAggregate</h3><p>语义上与 <a href="#aggregate">aggregate</a> 等价，只是在合并分区结果时，treeAggregate 将以多级树的形式逐级聚合，降低 Driver 端的压力   </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[Int]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.treeAggregate</span>(<span class="hljs-number">0</span>)(_+_, _+_, depth=<span class="hljs-number">2</span>)<br>res0: Int = <span class="hljs-number">21</span><br></code></pre></td></tr></table></figure>
+<h3 id="collect"><a href="#collect" class="headerlink" title="collect"></a>collect</h3><p>将 RDD 的所有记录收集起来，返回一个 Java 的 Array 集合到 Driver 端  </p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">scala</span>&gt; val rdd = sc.parallelize(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br><span class="hljs-attribute">rdd</span>: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[<span class="hljs-number">0</span>] at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br><span class="hljs-attribute">scala</span>&gt; rdd.treeAggregate(<span class="hljs-number">0</span>)(_+_, _+_, depth=<span class="hljs-number">2</span>)<br><span class="hljs-attribute">res0</span>: Array[Int] = Array(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>)<br></code></pre></td></tr></table></figure>
+<h3 id="collectAsMap"><a href="#collectAsMap" class="headerlink" title="collectAsMap"></a>collectAsMap</h3><p>将 K-V Pair 型 RDD 的所有记录起来，返回一个 Java 的 Map 集合到 Driver 端<br><em><strong>只能作用于 K-V Pair 型 RDD</strong></em></p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-built_in">List</span>(<span class="hljs-string">&quot;A&quot;</span> -&gt; <span class="hljs-number">1</span>, <span class="hljs-string">&quot;B&quot;</span> -&gt; <span class="hljs-number">2</span>))<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[(String, Int)]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.collectAsMap</span><br>res0: scala<span class="hljs-selector-class">.collection</span><span class="hljs-selector-class">.Map</span><span class="hljs-selector-attr">[String,Int]</span> = <span class="hljs-built_in">Map</span>(A -&gt; <span class="hljs-number">1</span>, B -&gt; <span class="hljs-number">2</span>)<br></code></pre></td></tr></table></figure>
+<h3 id="count"><a href="#count" class="headerlink" title="count"></a>count</h3><p>返回 RDD 的总记录数</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[(String, Int)]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.count</span><br>res0: Long = <span class="hljs-number">6</span><br></code></pre></td></tr></table></figure>
+<h3 id="countByKey"><a href="#countByKey" class="headerlink" title="countByKey"></a>countByKey</h3><p>返回 K-V Pair 型 RDD 的每个 Key 的记录数<br><em><strong>只能作用于 K-V Pair 型 RDD</strong></em></p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-built_in">List</span>(<span class="hljs-string">&quot;A&quot;</span> -&gt; <span class="hljs-number">1</span>, <span class="hljs-string">&quot;A&quot;</span> -&gt; <span class="hljs-number">11</span>, <span class="hljs-string">&quot;B&quot;</span> -&gt; <span class="hljs-number">2</span>))<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[(String, Int)]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.countByKey</span><br>res0: scala<span class="hljs-selector-class">.collection</span><span class="hljs-selector-class">.Map</span><span class="hljs-selector-attr">[String,Long]</span> = <span class="hljs-built_in">Map</span>(B -&gt; <span class="hljs-number">1</span>, A -&gt; <span class="hljs-number">2</span>)<br><br></code></pre></td></tr></table></figure>
+<h3 id="countApprox"><a href="#countApprox" class="headerlink" title="countApprox"></a>countApprox</h3><p>返回 RDD 总记录数的近似值, 在给定的 timeout 时间内返回有 confidence 概率准确的记录数的区间  </p>
+<figure class="highlight vbnet"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs vbnet">scala&gt; val rdd = sc.parallelize(<span class="hljs-number">1</span> <span class="hljs-keyword">to</span> <span class="hljs-number">10000</span> * <span class="hljs-number">10000</span>, <span class="hljs-number">1000</span>)<br><span class="hljs-symbol">rdd:</span> org.apache.spark.rdd.RDD[(<span class="hljs-type">String</span>, Int)] = ParallelCollectionRDD[<span class="hljs-number">0</span>] at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd.countApprox(timeout=<span class="hljs-number">500</span>, confidence=<span class="hljs-number">0.95</span>)<br><span class="hljs-symbol">res0:</span> org.apache.spark.<span class="hljs-keyword">partial</span>.PartialResult[org.apache.spark.<span class="hljs-keyword">partial</span>.BoundedDouble] = (<span class="hljs-keyword">partial</span>: [<span class="hljs-number">99984958.000</span>, <span class="hljs-number">100015042.000</span>])<br><br>scala&gt; rdd.countApprox(timeout=<span class="hljs-number">500</span>, confidence=<span class="hljs-number">0.0</span>)<br><span class="hljs-symbol">res126:</span> org.apache.spark.<span class="hljs-keyword">partial</span>.PartialResult[org.apache.spark.<span class="hljs-keyword">partial</span>.BoundedDouble] = (<span class="hljs-keyword">partial</span>: [<span class="hljs-number">100000000.000</span>, <span class="hljs-number">100000000.000</span>]<br></code></pre></td></tr></table></figure>
+<h3 id="countByKeyApprox"><a href="#countByKeyApprox" class="headerlink" title="countByKeyApprox"></a>countByKeyApprox</h3><p>返回 K-V Pair 型 RDD 的每个 Key 的记录数的近似值, 在给定的 timeout 时间内返回各个 Key 有 confidence 概率准确的记录数的区间<br><em><strong>只能作用于 K-V Pair 型 RDD</strong></em></p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs livescript">scala&gt; val rdd = sc.parallelize(List(<span class="hljs-string">&quot;A&quot;</span>, <span class="hljs-string">&quot;B&quot;</span>, <span class="hljs-string">&quot;C&quot;</span>), <span class="hljs-number">1</span>) cartesian sc.parallelize(<span class="hljs-number">1</span> <span class="hljs-keyword">to</span> <span class="hljs-number">10000</span> * <span class="hljs-number">10000</span>, <span class="hljs-number">100</span>)<br>rdd: org.apache.spark.rdd.RDD[(<span class="hljs-built_in">String</span>, Int)] = ParallelCollectionRDD[<span class="hljs-number">0</span>] at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd.countByKeyApprox(timeout=<span class="hljs-number">5000</span>, confidence=<span class="hljs-number">0.95</span>)<br>res0: org.apache.spark.partial.PartialResult[scala.collection.<span class="hljs-built_in">Map</span>[<span class="hljs-built_in">String</span>,org.apache.spark.partial.BoundedDouble]] = (partial: <span class="hljs-built_in">Map</span>(B -&gt; [<span class="hljs-number">99990807.000</span>, <span class="hljs-number">100009194.000</span>], A -&gt; [<span class="hljs-number">99990807.000</span>, <span class="hljs-number">100009194.000</span>], C -&gt; [<span class="hljs-number">99990807.000</span>, <span class="hljs-number">100009194.000</span>]))<br><br>scala&gt; rdd.countByKeyApprox(timeout=<span class="hljs-number">5000</span>, confidence=<span class="hljs-number">0.0</span>)<br>res1: org.apache.spark.partial.PartialResult[scala.collection.<span class="hljs-built_in">Map</span>[<span class="hljs-built_in">String</span>,org.apache.spark.partial.BoundedDouble]] = (partial: <span class="hljs-built_in">Map</span>(B -&gt; [<span class="hljs-number">100000000.000</span>, <span class="hljs-number">100000000.000</span>], A -&gt; [<span class="hljs-number">100000000.000</span>, <span class="hljs-number">100000000.000</span>], C -&gt; [<span class="hljs-number">100000000.000</span>, <span class="hljs-number">100000000.000</span>]))<br></code></pre></td></tr></table></figure>
+
+<h3 id="countByValue"><a href="#countByValue" class="headerlink" title="countByValue"></a>countByValue</h3><p>返回 RDD 中每条记录出现的次数  </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-built_in">List</span>(<span class="hljs-string">&quot;A&quot;</span>, <span class="hljs-string">&quot;A&quot;</span>, <span class="hljs-string">&quot;B&quot;</span>, <span class="hljs-string">&quot;B&quot;</span>, <span class="hljs-string">&quot;C&quot;</span>))<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[String]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">25</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.countByValue</span><br>res0: scala<span class="hljs-selector-class">.collection</span><span class="hljs-selector-class">.Map</span><span class="hljs-selector-attr">[String,Long]</span> = <span class="hljs-built_in">Map</span>(B -&gt; <span class="hljs-number">2</span>, C -&gt; <span class="hljs-number">1</span>, A -&gt; <span class="hljs-number">2</span>)<br></code></pre></td></tr></table></figure>
+<h3 id="countByValueApprox"><a href="#countByValueApprox" class="headerlink" title="countByValueApprox"></a>countByValueApprox</h3><p>返回 RDD 中每条记录出现的次数的近似值, 在给定的 timeout 时间内返回各个 Key 有 confidence 概率准确的记录数的区间</p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs livescript">scala&gt; val rdd = sc.parallelize(<span class="hljs-number">1</span> <span class="hljs-keyword">to</span> <span class="hljs-number">3000</span> * <span class="hljs-number">10000</span>, <span class="hljs-number">100</span>).<span class="hljs-keyword">map</span>(_ % <span class="hljs-number">3</span>)<br>rdd: org.apache.spark.rdd.RDD[Int] = MapPartitionsRDD[<span class="hljs-number">281</span>] at <span class="hljs-keyword">map</span> at &lt;console&gt;:<span class="hljs-number">25</span> <br><br>scala&gt; rdd.countByValueApprox(<span class="hljs-number">500</span>, <span class="hljs-number">0.95</span>)<br>res0: org.apache.spark.partial.PartialResult[scala.collection.<span class="hljs-built_in">Map</span>[Int,org.apache.spark.partial.BoundedDouble]] = (partial: <span class="hljs-built_in">Map</span>(<span class="hljs-number">0</span> -&gt; [<span class="hljs-number">9996494.000</span>, <span class="hljs-number">10003507.000</span>], <span class="hljs-number">1</span> -&gt; [<span class="hljs-number">9996494.000</span>, <span class="hljs-number">10003507.000</span>], <span class="hljs-number">2</span> -&gt; [<span class="hljs-number">9996494.000</span>, <span class="hljs-number">10003507.000</span>]))<br><br>scala&gt; rdd.countByValueApprox(<span class="hljs-number">500</span>, <span class="hljs-number">0.0</span>)<br>res1: org.apache.spark.partial.PartialResult[scala.collection.<span class="hljs-built_in">Map</span>[Int,org.apache.spark.partial.BoundedDouble]] = (partial: <span class="hljs-built_in">Map</span>(<span class="hljs-number">0</span> -&gt; [<span class="hljs-number">10000000.000</span>, <span class="hljs-number">10000000.000</span>], <span class="hljs-number">1</span> -&gt; [<span class="hljs-number">10000000.000</span>, <span class="hljs-number">10000000.000</span>], <span class="hljs-number">2</span> -&gt; [<span class="hljs-number">10000000.000</span>, <span class="hljs-number">10000000.000</span>]))<br></code></pre></td></tr></table></figure>
+<h3 id="countApproxDistinct"><a href="#countApproxDistinct" class="headerlink" title="countApproxDistinct"></a>countApproxDistinct</h3><p>返回 RDD 去重后的记录数的近似值, 使用的算法基于 streamlib 实现的<a target="_blank" rel="noopener" href="https://dl.acm.org/doi/10.1145/2452376.2452456">《HyperLogLog in practice: algorithmic engineering of a state of the art cardinality estimation algorithm》</a><br>p：正常集合的精度值<br>sp：稀疏集合的精度值  </p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">scala</span>&gt; val rdd = sc.parallelize(<span class="hljs-number">1</span> to <span class="hljs-number">10000</span> * <span class="hljs-number">10000</span>, <span class="hljs-number">100</span>).map(_ % <span class="hljs-number">1000</span>)<br><span class="hljs-attribute">rdd</span>: org.apache.spark.rdd.RDD[(String, Int)] = ParallelCollectionRDD[<span class="hljs-number">0</span>] at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br><span class="hljs-attribute">scala</span>&gt; rdd.distinct.count<br><span class="hljs-attribute">res0</span>: Long = <span class="hljs-number">3</span><br><br><span class="hljs-attribute">scala</span>&gt; rdd.countApproxDistinct(<span class="hljs-number">4</span>, <span class="hljs-number">0</span>)<br><span class="hljs-attribute">res1</span>: Long = <span class="hljs-number">1213</span><br><br></code></pre></td></tr></table></figure>
+<h3 id="max"><a href="#max" class="headerlink" title="max"></a>max</h3><p>返回 RDD 中记录的最大值  </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[(String, Int)]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.max</span><br>res0: Int = <span class="hljs-number">6</span><br></code></pre></td></tr></table></figure>
+<h3 id="min"><a href="#min" class="headerlink" title="min"></a>min</h3><p>返回 RDD 中记录的最大值</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[(String, Int)]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.min</span><br>res0: Int = <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+<h3 id="isEmpty"><a href="#isEmpty" class="headerlink" title="isEmpty"></a>isEmpty</h3><p>判断 RDD 是否为空, 返回 true 或 false  </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[(String, Int)]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.isEmpty</span><br>res0: Boolean = false<br></code></pre></td></tr></table></figure>
+<h3 id="first"><a href="#first" class="headerlink" title="first"></a>first</h3><p>返回 RDD 的第一条记录  </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[(String, Int)]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.first</span><br>res0: Int = <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+<h3 id="take"><a href="#take" class="headerlink" title="take"></a>take</h3><p>返回 RDD 中的 n 条记录, 默认先从一个 partition 中获取，不足 n 时再从其他 partition 中获取, 直到满足 n 为止</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[(String, Int)]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.take</span>(<span class="hljs-number">3</span>)<br>res0: Array<span class="hljs-selector-attr">[Int]</span> = <span class="hljs-built_in">Array</span>(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>)<br></code></pre></td></tr></table></figure>
+<h3 id="top"><a href="#top" class="headerlink" title="top"></a>top</h3><p>返回 RDD 降序排序之后的前 n 条记录，与 <a href="#takeordered">takeOrdered</a> 相反</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[(String, Int)]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.top</span>(<span class="hljs-number">3</span>)<br>res0: Array<span class="hljs-selector-attr">[Int]</span> = <span class="hljs-built_in">Array</span>(<span class="hljs-number">6</span>, <span class="hljs-number">5</span>, <span class="hljs-number">4</span>)<br></code></pre></td></tr></table></figure>
+<h3 id="takeOrdered"><a href="#takeOrdered" class="headerlink" title="takeOrdered"></a>takeOrdered</h3><p>返回 RDD 升序排序之后的前 n 条记录, 与 <a href="#top">top</a> 相反</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[(String, Int)]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.takeOrdered</span>(<span class="hljs-number">3</span>)<br>res0: Array<span class="hljs-selector-attr">[Int]</span> = <span class="hljs-built_in">Array</span>(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>)<br></code></pre></td></tr></table></figure>
+<h3 id="takeSample"><a href="#takeSample" class="headerlink" title="takeSample"></a>takeSample</h3><p>返回 RDD 中随机的 n 条记录</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[(String, Int)]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt;  rdd<span class="hljs-selector-class">.takeSample</span>(withReplacement=false, <span class="hljs-number">3</span>)<br>res0: Array<span class="hljs-selector-attr">[Int]</span> = <span class="hljs-built_in">Array</span>(<span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">6</span>)<br></code></pre></td></tr></table></figure>
+<h3 id="foreach"><a href="#foreach" class="headerlink" title="foreach"></a>foreach</h3><p>遍历 RDD 中的每一条记录，根据提供的 record &#x3D;&gt; Unit 函数，将记录写入外部系统，或打印到控制台，或添加到其他 Java 集合中等</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; val rdd = sc<span class="hljs-selector-class">.parallelize</span>(<span class="hljs-number">1</span> to <span class="hljs-number">6</span>)<br>rdd: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.rdd</span><span class="hljs-selector-class">.RDD</span><span class="hljs-selector-attr">[(String, Int)]</span> = ParallelCollectionRDD<span class="hljs-selector-attr">[0]</span> at parallelize at &lt;console&gt;:<span class="hljs-number">23</span><br><br>scala&gt; rdd<span class="hljs-selector-class">.foreach</span>(<span class="hljs-attribute">x</span> =&gt; <span class="hljs-built_in">print</span>(x + <span class="hljs-string">&quot;,&quot;</span>))<br><span class="hljs-number">4</span>,<span class="hljs-number">1</span>,<span class="hljs-number">6</span>,<span class="hljs-number">5</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<br></code></pre></td></tr></table></figure>
+
+<h2 id="写入外部系统"><a href="#写入外部系统" class="headerlink" title="写入外部系统"></a>写入外部系统</h2><h3 id="saveAsTextFile"><a href="#saveAsTextFile" class="headerlink" title="saveAsTextFile"></a>saveAsTextFile</h3><p>将 RDD 以 TEXT 文件格式写入 Hadoop 支持的外部文件系统</p>
+<h3 id="saveAsSequenceFile"><a href="#saveAsSequenceFile" class="headerlink" title="saveAsSequenceFile"></a>saveAsSequenceFile</h3><p>将 RDD 以 Hadoop SequenceFile 文件格式写入 Hadoop 支持的外部文件系统</p>
+<h3 id="saveAsObjectFile"><a href="#saveAsObjectFile" class="headerlink" title="saveAsObjectFile"></a>saveAsObjectFile</h3><p>将 RDD 序列化之后， 以 Hadoop SequenceFile 文件格式写入 Hadoop 支持的外部文件系统</p>
+<h3 id="saveAsHadoopFile"><a href="#saveAsHadoopFile" class="headerlink" title="saveAsHadoopFile"></a>saveAsHadoopFile</h3><p>等效于 <a href="#saveAsTextFile">saveAsTextFile</a></p>
+<h3 id="saveAsNewAPIHadoopFile"><a href="#saveAsNewAPIHadoopFile" class="headerlink" title="saveAsNewAPIHadoopFile"></a>saveAsNewAPIHadoopFile</h3><p>将 K-V Pair 型 RDD，以指定的文件格式写入 Hadoop 支持的外部文件系统</p>
+<h3 id="saveAsHadoopDataset"><a href="#saveAsHadoopDataset" class="headerlink" title="saveAsHadoopDataset"></a>saveAsHadoopDataset</h3><p>将 K-V Pair 型 RDD，以指定的文件格式写入 Hadoop 支持的外部存储系统中(如 HDFS、HBase等)</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Spark/" class="category-chain-item">Spark</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Spark/" class="print-no-link">#Spark</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Spark RDD - Action 算子</div>
+      <div>http://example.com/2025/01/01/apache-spark/spark-rdd-action/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>唐长老</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年1月1日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/01/01/apache-spark/spark-dataframe/" title="Spark Dataframe">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Spark Dataframe</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/01/01/apache-spark/spark-rdd-control/" title="Spark RDD - 控制算子">
+                        <span class="hidden-mobile">Spark RDD - 控制算子</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"C9jETuLwvCO4tHwlcXW2ueCa-gzGzoHsz","appKey":"ujYxRlBDWb8IcQmRmFaoOqAi","path":"window.location.pathname","placeholder":"写留言","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

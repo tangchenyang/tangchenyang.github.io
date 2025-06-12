@@ -1,0 +1,839 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Chenyang Tang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="本文将安利一个个人博客模板仓库，用于快速搭建个人博客网站。用户只需要编写 Markdown 格式的博客内容，提交后即可自动发布到个人博客网站上。   主要功能 自动将 Markdown 转换为静态网页代码 自动发布到 github.io 网站 支持评论功能 支持网站统计功能  准备条件 github 账号  1. 创建个人博客网站仓库在 github 上创建一个新的代码仓库, 此仓库用于保存网页代">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在 Github 上构建个人博客网站">
+<meta property="og:url" content="http://example.com/2025/05/14/build-blog-on-github/index.html">
+<meta property="og:site_name" content="唐长老的个人博客">
+<meta property="og:description" content="本文将安利一个个人博客模板仓库，用于快速搭建个人博客网站。用户只需要编写 Markdown 格式的博客内容，提交后即可自动发布到个人博客网站上。   主要功能 自动将 Markdown 转换为静态网页代码 自动发布到 github.io 网站 支持评论功能 支持网站统计功能  准备条件 github 账号  1. 创建个人博客网站仓库在 github 上创建一个新的代码仓库, 此仓库用于保存网页代">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.361smiekru.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.83a9gcu9y8.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.7i0lu24fp5.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.7i0lu28blh.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.51edf57flw.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.39lek8pk30.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.4g4psuhvjp.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.73u637c7sz.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.5q7n0nijk6.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.5tr8yddq50.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.4qrjnhk8jj.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.3k88ew05g4.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.6wqy99km34.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.5q7n0n2oqb.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.83a9hvmezk.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.969ysrl8qa.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.8z6qxdty3c.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.7w71mhaaey.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.5tr8yffzsz.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.map4yq6d.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.4cl3wq4wkt.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.92qcv53ex1.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.58hlc6pzpw.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.70ak73g9fn.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.2h8j44bgwt.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.4qrjnlzcdo.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.4jobs6lmvr.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.7zqnka9upm.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.70ak74bba3.webp">
+<meta property="article:published_time" content="2025-05-14T14:02:45.000Z">
+<meta property="article:modified_time" content="2025-06-12T06:50:37.249Z">
+<meta property="article:author" content="唐长老">
+<meta property="article:tag" content="blog">
+<meta property="article:tag" content="github">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.361smiekru.webp">
+  
+  
+  
+  <title>在 Github 上构建个人博客网站 - 唐长老的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"C9jETuLwvCO4tHwlcXW2ueCa-gzGzoHsz","app_key":"ujYxRlBDWb8IcQmRmFaoOqAi","server_url":"https://c9jetulw.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>唐长老的个人博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="在 Github 上构建个人博客网站"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-05-14 14:02" pubdate>
+          2025年5月14日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          9 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">在 Github 上构建个人博客网站</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>本文将安利一个个人博客模板仓库，用于快速搭建个人博客网站。<br>用户只需要编写 Markdown 格式的博客内容，提交后即可自动发布到个人博客网站上。  </p>
+<h1 id="主要功能"><a href="#主要功能" class="headerlink" title="主要功能"></a>主要功能</h1><ul>
+<li>自动将 Markdown 转换为静态网页代码</li>
+<li>自动发布到 github.io 网站</li>
+<li>支持评论功能</li>
+<li>支持网站统计功能</li>
+</ul>
+<h1 id="准备条件"><a href="#准备条件" class="headerlink" title="准备条件"></a>准备条件</h1><ul>
+<li>github 账号</li>
+</ul>
+<h1 id="1-创建个人博客网站仓库"><a href="#1-创建个人博客网站仓库" class="headerlink" title="1. 创建个人博客网站仓库"></a>1. 创建个人博客网站仓库</h1><p>在 github 上创建一个新的代码仓库, 此仓库用于保存网页代码等，来呈现你的个人博客。<br>创建完成后你可以使用 <a target="_blank" rel="noopener" href="https://xxx.github.io/">https://xxx.github.io</a> 来访问个人博客网站。</p>
+<ol>
+<li><p>点击 <code>your repositories</code><br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.361smiekru.webp" srcset="/img/loading.gif" lazyload alt="image">  </p>
+</li>
+<li><p>点击 <code>New</code><br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.83a9gcu9y8.webp" srcset="/img/loading.gif" lazyload alt="image">  </p>
+</li>
+<li><p>填写 <code>Repository name</code> 后点击 <code>Create repository</code><br><strong>注意：</strong> 仓库名格式必须是 <code>&lt;your username&gt;.github.io</code>, 例如 <code>tangchenyang.github.io</code><br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.7i0lu24fp5.webp" srcset="/img/loading.gif" lazyload alt="image">  </p>
+</li>
+<li><p>点击 <code>creating a new file</code> 创建一个初始页面<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.7i0lu28blh.webp" srcset="/img/loading.gif" lazyload alt="image"><br>初始文件名为 <code>index.html</code>, 并编辑以下内容：   </p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">&quot;en&quot;</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>Hello, this is my personal blog<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<p>编辑完成后点击 <code>Commit changes</code> </p>
+<p><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.51edf57flw.webp" srcset="/img/loading.gif" lazyload alt="image"><br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.39lek8pk30.webp" srcset="/img/loading.gif" lazyload alt="image"></p>
+</li>
+<li><p>等待 Github Action 部署完成<br>页面创建完成后，Github Action 将自动触发部署任务，部署完成后，你的个人网站将可以访问。<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.4g4psuhvjp.webp" srcset="/img/loading.gif" lazyload alt="image"></p>
+</li>
+<li><p>访问你的个人网站<br>在浏览器输入 <code>&lt;your username&gt;.github.io</code> 即可看到你的个人博客网站初始内容。<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.73u637c7sz.webp" srcset="/img/loading.gif" lazyload alt="image"></p>
+</li>
+</ol>
+<h1 id="2-创建博客文章仓库"><a href="#2-创建博客文章仓库" class="headerlink" title="2. 创建博客文章仓库"></a>2. 创建博客文章仓库</h1><p>此仓库用于维护 Markdown 格式的博客文章，提交后将自动发布到个人博客网站。</p>
+<h2 id="申请-GitHub-PAT-Personal-Access-Token"><a href="#申请-GitHub-PAT-Personal-Access-Token" class="headerlink" title="申请 GitHub PAT (Personal Access Token)"></a>申请 GitHub PAT (Personal Access Token)</h2><ol>
+<li><p>点击 <code>Settings</code><br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.5q7n0nijk6.webp" srcset="/img/loading.gif" lazyload alt="image">  </p>
+</li>
+<li><p>点击最底部的 <code>Developers settings</code><br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.5tr8yddq50.webp" srcset="/img/loading.gif" lazyload alt="image">  </p>
+</li>
+<li><p>依次点击下图按钮，进入 New Personal Access Token 界面<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.4qrjnhk8jj.webp" srcset="/img/loading.gif" lazyload alt="image"></p>
+</li>
+<li><p>设置有效期和权限，生成 PAT<br><code>Note</code> 见名知意即可；<code>Expiration</code> 根据情况选择，如<code>no expiration</code>；Scope 选择 <code>repo</code> 即可。<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.3k88ew05g4.webp" srcset="/img/loading.gif" lazyload alt="image"><br>勾选完成后，点击底部的 <code>Generate token</code><br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.6wqy99km34.webp" srcset="/img/loading.gif" lazyload alt="image"><br>生成 PAT 后，复制并妥善保管，离开此页面后将不再可见。</p>
+</li>
+</ol>
+<h2 id="创建博客文章仓库"><a href="#创建博客文章仓库" class="headerlink" title="创建博客文章仓库"></a>创建博客文章仓库</h2><ol>
+<li><p>Github 创建博客仓库 <code>blog</code><br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.5q7n0n2oqb.webp" srcset="/img/loading.gif" lazyload alt="image"></p>
+</li>
+<li><p>添加 Repository secrets<br>依次点击 <code>Settings</code> -&gt; <code>Secrets and variables</code> -&gt; <code>Actions</code> -&gt; <code>New repository secret</code><br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.83a9hvmezk.webp" srcset="/img/loading.gif" lazyload alt="image"><br><code>Name</code> 填写 <code>HEXO_DEPLOY_PAT</code>; <code>Secret</code> 将前面生成的Personal Access Token 填写至此；点击 <code>Add secret</code> 即可。<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.969ysrl8qa.webp" srcset="/img/loading.gif" lazyload alt="image"></p>
+</li>
+</ol>
+<h2 id="关联模板仓库代码"><a href="#关联模板仓库代码" class="headerlink" title="关联模板仓库代码"></a>关联模板仓库代码</h2><ol>
+<li><p>克隆模板博客仓库到本地，并重命名为 <code>blog</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">git clone https://github.com/tangchenyang/blog_template_repo.git blog<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>修改提交信息<br>进入 <code>blog</code> 目录下，编辑 <code>.github/workflows/deploy.yml</code>文件, 将 <code>GIT_HTTPS_URL</code>，<code>GIT_USER_NAME</code> 和 <code>GIT_USER_EMAIL</code> 按自己的信息替换即可，如：<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.8z6qxdty3c.webp" srcset="/img/loading.gif" lazyload alt="image"></p>
+</li>
+<li><p>关联 <code>blog</code> 仓库, 并推送到远端  </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell">cd blog<br>rm -rf .git<br>echo &quot;我的个人博客&quot; &gt; README.md<br>git init<br>git add * &amp;&amp; git add .*<br>git commit -m &quot;first commit&quot;<br>git branch -M master<br>git remote add origin git@github.com:tangchenyang/blog.git<br>git push -u origin master<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>检查博客文章仓库 <code>blob</code> 的GHA (GitHub Action)<br>代码推送到远端 <code>blog</code> 仓库后，由于包含了 workflow, 因此 GHA 将自动触发 CI&#x2F;CD Pipeline;<br><code>blog/blogs</code> 目录下的所有markdown 文件将自动转换为静态网页代码，并自动提交到你的个人博客网站仓库 <code>&lt;your username&gt;.github.io</code><br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.7w71mhaaey.webp" srcset="/img/loading.gif" lazyload alt="image"></p>
+</li>
+<li><p>检查个人博客网站仓库 <code>&lt;your username&gt;.github.io</code> 的 GHA<br>由 <code>blog</code> GHA 自动提交的静态网页代码将自动触发 <code>&lt;your username&gt;.github.io</code> 的GHA，自动将静态网页部署到你的个人博客网站上。<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.5tr8yffzsz.webp" srcset="/img/loading.gif" lazyload alt="image"><br>GHA 执行完成后，在浏览器输入 <code>&lt;your username&gt;.github.io</code> 即可看到你的个人博客网站初始内容。<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.map4yq6d.webp" srcset="/img/loading.gif" lazyload alt="image"></p>
+</li>
+</ol>
+<h1 id="3-开启评论和网站统计功能"><a href="#3-开启评论和网站统计功能" class="headerlink" title="3. 开启评论和网站统计功能"></a>3. 开启评论和网站统计功能</h1><p>Fluid 主题支持评论和网站统计功能，本文将使用第三方服务 <code>LeanCloud</code> 实现免费功能 。  </p>
+<ol>
+<li><p>申请 LeanCloud 账号<br>进入 <a target="_blank" rel="noopener" href="https://console.leancloud.cn/register">LeanCloud 账号注册</a> 注册账号, 登录并完成实名认证和邮箱验证<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.4cl3wq4wkt.webp" srcset="/img/loading.gif" lazyload alt="image"><br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.92qcv53ex1.webp" srcset="/img/loading.gif" lazyload alt="image"><br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.58hlc6pzpw.webp" srcset="/img/loading.gif" lazyload alt="image">  </p>
+</li>
+<li><p>创建 App<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.70ak73g9fn.webp" srcset="/img/loading.gif" lazyload alt="image"></p>
+</li>
+<li><p>获取 AppID、AppKey 和 AppServerURL<br>进入 APP<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.2h8j44bgwt.webp" srcset="/img/loading.gif" lazyload alt="image"><br>依次点击 <code>Settings</code> -&gt; <code>App Keys</code>，即可看到相关信息<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.4qrjnlzcdo.webp" srcset="/img/loading.gif" lazyload alt="image">  </p>
+</li>
+<li><p>将上述信息添加到 <code>blog</code> 仓库的 Repository secrets  </p>
+<ul>
+<li>将 <code>AppID</code> 添加为 <code>HEXO_LEANCLOUD_APP_ID</code>  </li>
+<li>将 <code>AppKey</code> 添加为 <code>HEXO_LEANCLOUD_APP_KEY</code>    </li>
+<li>将 <code>REST API Server URL</code> 添加为 <code>HEXO_LEANCLOUD_APP_SERVER_URL</code><br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.4jobs6lmvr.webp" srcset="/img/loading.gif" lazyload alt="image"></li>
+</ul>
+</li>
+<li><p>修改启用评论和统计功能<br>修改 <code>blob</code> 仓库中的 <code>.github/workflows/deploy.yml</code> 文件， 将<code>ENABLE_WEB_STATISTICS</code> 和 <code>ENABLE_COMMENTS</code> 设置为 <code>true</code>，提交即可<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.7zqnka9upm.webp" srcset="/img/loading.gif" lazyload alt="image"><br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.70ak74bba3.webp" srcset="/img/loading.gif" lazyload alt="image"></p>
+</li>
+</ol>
+<h1 id="发布任意博客文章"><a href="#发布任意博客文章" class="headerlink" title="发布任意博客文章"></a>发布任意博客文章</h1><p>完成上述所有流程后，当你在 <code>blob</code> 仓库的 blogs 目录下添加任意 Markdown 文件并提交，大约一到两分钟后，你的个人博客网站上就能看到该文章。<br>现在开始享受你的写作旅程吧！ </p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%85%B6%E4%BB%96/" class="category-chain-item">其他</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/blog/" class="print-no-link">#blog</a>
+      
+        <a href="/tags/github/" class="print-no-link">#github</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>在 Github 上构建个人博客网站</div>
+      <div>http://example.com/2025/05/14/build-blog-on-github/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Chenyang Tang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年5月14日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/05/30/llm/llm-overview/" title="LLM - 大语言模型简介">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">LLM - 大语言模型简介</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/05/13/elk/Manual-Install-ELK/" title="ELK 集成">
+                        <span class="hidden-mobile">ELK 集成</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"C9jETuLwvCO4tHwlcXW2ueCa-gzGzoHsz","appKey":"ujYxRlBDWb8IcQmRmFaoOqAi","path":"window.location.pathname","placeholder":"写留言","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

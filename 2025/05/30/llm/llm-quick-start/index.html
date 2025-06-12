@@ -1,0 +1,809 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Chenyang Tang">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="LLM - 快速上手大语言模型前面的文章我们介绍了什么是AI，都是停留在一些概念上面，接下来，我们实际来用几个简单的步骤和代码，来体验一下，快速上手大语言模型。 1 环境准备 Python  3.10 及以上  Python 是一个非常流行的编程语言，广泛应用于数据科学、机器学习、人工智能等领域。 本文也将在 Python 环境下来进行实际操作的演示。  如果您还没有安装 Python，可以参考">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LLM - 快速上手大语言模型">
+<meta property="og:url" content="http://example.com/2025/05/30/llm/llm-quick-start/index.html">
+<meta property="og:site_name" content="唐长老的个人博客">
+<meta property="og:description" content="LLM - 快速上手大语言模型前面的文章我们介绍了什么是AI，都是停留在一些概念上面，接下来，我们实际来用几个简单的步骤和代码，来体验一下，快速上手大语言模型。 1 环境准备 Python  3.10 及以上  Python 是一个非常流行的编程语言，广泛应用于数据科学、机器学习、人工智能等领域。 本文也将在 Python 环境下来进行实际操作的演示。  如果您还没有安装 Python，可以参考">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.wispsb20t.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.4ub66goojo.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.1lc29t2j6o.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.lvywp174i.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.8s3jn6tc9x.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.4g4qfndbk0.png">
+<meta property="article:published_time" content="2025-05-30T11:10:55.000Z">
+<meta property="article:modified_time" content="2025-06-12T06:50:37.249Z">
+<meta property="article:author" content="唐长老">
+<meta property="article:tag" content="LLM">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.wispsb20t.webp">
+  
+  
+  
+  <title>LLM - 快速上手大语言模型 - 唐长老的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"C9jETuLwvCO4tHwlcXW2ueCa-gzGzoHsz","app_key":"ujYxRlBDWb8IcQmRmFaoOqAi","server_url":"https://c9jetulw.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>唐长老的个人博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="LLM - 快速上手大语言模型"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-05-30 11:10" pubdate>
+          2025年5月30日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          12 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">LLM - 快速上手大语言模型</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="LLM-快速上手大语言模型"><a href="#LLM-快速上手大语言模型" class="headerlink" title="LLM - 快速上手大语言模型"></a>LLM - 快速上手大语言模型</h1><p>前面的文章我们介绍了什么是AI，都是停留在一些概念上面，接下来，我们实际来用几个简单的步骤和代码，来体验一下，快速上手大语言模型。</p>
+<h2 id="1-环境准备"><a href="#1-环境准备" class="headerlink" title="1 环境准备"></a>1 环境准备</h2><ul>
+<li>Python  3.10 及以上</li>
+</ul>
+<p>Python 是一个非常流行的编程语言，广泛应用于数据科学、机器学习、人工智能等领域。 本文也将在 Python 环境下来进行实际操作的演示。 </p>
+<p>如果您还没有安装 Python，可以参考 <a target="_blank" rel="noopener" href="https://www.runoob.com/python/python-install.html">Python 环境搭建</a> 下载并安装。  </p>
+<h3 id="安装依赖包"><a href="#安装依赖包" class="headerlink" title="安装依赖包"></a>安装依赖包</h3><p>OpenAI 是一个提供大语言模型的公司，他们也提供了一套 API 来与大语言模型进行交互。 同时也支持其他厂商的大语言模型，比如 DeepSeek 等。<br>因此我们需要安装 <code>openai</code> 库来与 OpenAI 进行交互。 你可以使用以下命令来安装 <code>openai</code> 库：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">pip install openai<br></code></pre></td></tr></table></figure>
+
+<h3 id="启动-Notebook"><a href="#启动-Notebook" class="headerlink" title="启动 Notebook"></a>启动 Notebook</h3><p>Notebook 是一个非常方便的工具，可以用来交互式地进行编写和运行代码。 </p>
+<p>你可以使用以下命令来启动 Notebook：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">jupyter notebook<br></code></pre></td></tr></table></figure>
+
+<p>启动Notebook 后，你会跳转到一个界面，类似于以下的截图：  </p>
+<p><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.wispsb20t.webp" srcset="/img/loading.gif" lazyload alt="Notebook 界面"></p>
+<p>我们点击 <code>New</code> 按钮，然后选择 <code>Python 3</code> 来创建一个新的 Notebook。  </p>
+<p><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.4ub66goojo.webp" srcset="/img/loading.gif" lazyload alt="新建 Notebook"></p>
+<p>然后在 Notebook 中，你可以开始编写代码了。  </p>
+<p>比如我们来编写一个简单的 Python 代码，输出 “Hello, Python”。  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Hello, Python&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<p>按下 <code>Shift + 回车键</code>，代码就会运行，并且你会看到输出 “Hello, Python”。    </p>
+<p><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.1lc29t2j6o.webp" srcset="/img/loading.gif" lazyload alt="Notebook 运行结果"></p>
+<p>如果你本地的情况和上面的截图一样，就表示现在 Python 环境准备好了。</p>
+<h2 id="2-申请-API-KEY"><a href="#2-申请-API-KEY" class="headerlink" title="2 申请 API KEY"></a>2 申请 API KEY</h2><p>OpenAI 是与大语言模型交互的 API，但是大语言模型是由各个厂商提供的，比如：</p>
+<ul>
+<li>OpenAI 公司的 <code>GPT-4</code>、<code>GPT-3.5</code>、<code>GPT-3</code> 等</li>
+<li>DeepSeek 公司的 <code>Deepseek-R1</code> </li>
+<li>阿里巴巴公司的 <code>通义千问(Qwen3)</code> </li>
+<li>…</li>
+</ul>
+<p>因此我们需要先去对应的厂商官网申请 API KEY。</p>
+<p>例如 <a target="_blank" rel="noopener" href="https://bailian.console.aliyun.com/?tab=model#/model-market/detail/qwen3?modelGroup=qwen3">阿里云百炼平台</a> 为每个用户提供了多个大语言模型的免费使用额度，可以满足我们学习大语言模型的需求。 </p>
+<p><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.lvywp174i.webp" srcset="/img/loading.gif" lazyload alt="通义千问免费额度"></p>
+<p>因此我们可以访问 <a target="_blank" rel="noopener" href="https://bailian.console.aliyun.com/?tab=model#/api-key">阿里云百炼 API-Key</a> 来申请阿里厂商的 API KEY。</p>
+<p><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.8s3jn6tc9x.webp" srcset="/img/loading.gif" lazyload alt="阿里云百炼 - 创建 API KEY"></p>
+<p>创建好后，点击 <code>查看</code> 按钮，就可以看到 API KEY 的信息了。 然后将其复制下来，后面在代码中使用。  </p>
+<p><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/image.4g4qfndbk0.png" srcset="/img/loading.gif" lazyload alt="阿里云百炼 - 查看 API KEY"></p>
+<h2 id="3-与-AI-对话"><a href="#3-与-AI-对话" class="headerlink" title="3 与 AI 对话"></a>3 与 AI 对话</h2><p>Python 环境准备好了，API KEY 也申请好了，接下来就可以与 OpenAI 进行交互了。 我们先回到前面打开的 Notebook 页面中，准备运行我们的AI代码。 </p>
+<ol>
+<li>首先需要导入 <code>openai</code> 库，然后创建一个 <code>OpenAI</code> 的客户端：在 Notebook 中输入以下代码片段，并按 Shift + 回车执行</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python">BASE_URL=<span class="hljs-string">&quot;https://dashscope.aliyuncs.com/compatible-mode/v1&quot;</span> <span class="hljs-comment"># 阿里云的 API 地址</span><br>API_KEY=<span class="hljs-string">&quot;***&quot;</span> <span class="hljs-comment"># 替换为你的 API KEY</span><br><br><span class="hljs-keyword">from</span> openai <span class="hljs-keyword">import</span> OpenAI<br>client = OpenAI(base_url=BASE_URL, api_key=API_KEY)<br><span class="hljs-built_in">print</span>(client)<br></code></pre></td></tr></table></figure>
+<p>将会输出类似以下的输出，即代表成功创建了 OpenAI 的客户端：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">&lt;openai.OpenAI object at 0x10952b790&gt;<br></code></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>然后我们使用阿里的 <code>通义千问-Turbo (qwen-turbo-latest)</code> 模型来发起一个对话，向 AI 发送打招呼的消息 “你好”</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python">MODEL=<span class="hljs-string">&quot;qwen-turbo-latest&quot;</span><br>response = client.chat.completions.create(<br>    model=MODEL,<br>    messages=[<br>        &#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;你好&quot;</span>&#125;<br>    ],<br>)<br>response_content = response.choices[<span class="hljs-number">0</span>].message.content<br><span class="hljs-built_in">print</span>(response_content)<br></code></pre></td></tr></table></figure>
+<p>我们将会看到AI的回答，比如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">你好！很高兴见到你。有什么我可以帮你的吗？😊<br></code></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>为了方便我们向AI发送不同的消息，我们可以上面的代码封装成一个 chat 函数，函数的输入是我们发送给 AI 的消息，函数的返回值是 AI 的回复。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python">BASE_URL=<span class="hljs-string">&quot;https://dashscope.aliyuncs.com/compatible-mode/v1&quot;</span> <span class="hljs-comment"># 阿里云的 API 地址</span><br>API_KEY=<span class="hljs-string">&quot;***&quot;</span> <span class="hljs-comment"># 替换为你的 API KEY</span><br>MODEL=<span class="hljs-string">&quot;qwen-turbo-latest&quot;</span><br><br><span class="hljs-keyword">from</span> openai <span class="hljs-keyword">import</span> OpenAI<br>client = OpenAI(base_url=BASE_URL, api_key=API_KEY)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">chat</span>(<span class="hljs-params">message</span>):<br>    response = client.chat.completions.create(<br>        model=MODEL,<br>        messages=[<br>            &#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: message&#125;<br>        ],<br>    )<br>    response_content = response.choices[<span class="hljs-number">0</span>].message.content<br>    <span class="hljs-keyword">return</span> response_content<br></code></pre></td></tr></table></figure>
+
+<p>然后我们就可以使用这个 <code>chat</code> 函数来与 AI 进行对话了。比如：</p>
+<ul>
+<li><p>发送 “今天天气真不错”  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-built_in">print</span>(chat(<span class="hljs-string">&quot;今天天气真不错&quot;</span>))<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>AI 回复： </p>
+ <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">是啊，今天的天气确实很棒！阳光明媚，微风轻拂，正是出去走走、放松心情的好时候。你有什么计划吗？要不要一起去公园散步或者喝杯咖啡？<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>发送 “什么咖啡最好喝”  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-built_in">print</span>(chat(<span class="hljs-string">&quot;简单说一下喝咖啡的好处&quot;</span>))<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>AI 回复</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python">喝咖啡有以下一些好处：<br><br><span class="hljs-number">1.</span> **提神醒脑**：咖啡中的咖啡因能刺激中枢神经系统，帮助提高注意力、集中力和反应速度。<br><br><span class="hljs-number">2.</span> **增强体力与运动表现**：咖啡因可以促进脂肪分解，为身体提供能量，有助于提升运动表现。<br><br><span class="hljs-number">3.</span> **抗氧化作用**：咖啡含有丰富的抗氧化物质，有助于抵抗自由基，减缓细胞老化。<br><br><span class="hljs-number">4.</span> **降低某些疾病风险**：适量饮用咖啡可能降低患<span class="hljs-number">2</span>型糖尿病、帕金森病、肝病和某些癌症的风险。<br><br><span class="hljs-number">5.</span> **改善情绪**：咖啡因可以促进多巴胺分泌，有助于改善心情，减少抑郁风险。<br><br>不过要注意的是，过量饮用咖啡可能导致失眠、心悸、胃部不适等问题，建议每天摄入量不超过<span class="hljs-number">400</span>毫克咖啡因（约<span class="hljs-number">3</span>-<span class="hljs-number">4</span>杯普通咖啡）。<br></code></pre></td></tr></table></figure></li>
+</ul>
+<p>以上就是一个最简单的与 OpenAI 进行交互的示例，希望这个示例能帮助你快速上手大语言模型，非常容易动手实践吧？ </p>
+<p>如果有任何问题或需要进一步的帮助，欢迎在评论区留言。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/LLM/" class="category-chain-item">LLM</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/LLM/" class="print-no-link">#LLM</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>LLM - 快速上手大语言模型</div>
+      <div>http://example.com/2025/05/30/llm/llm-quick-start/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Chenyang Tang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年5月30日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/05/30/llm/llm-openai-prompt-optimize/" title="LLM - 提示词优化">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">LLM - 提示词优化</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/05/30/llm/llm-overview/" title="LLM - 大语言模型简介">
+                        <span class="hidden-mobile">LLM - 大语言模型简介</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"C9jETuLwvCO4tHwlcXW2ueCa-gzGzoHsz","appKey":"ujYxRlBDWb8IcQmRmFaoOqAi","path":"window.location.pathname","placeholder":"写留言","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,974 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="唐长老">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Spark DataFrameDataFrame 简介Spark DataFrame 是 Spark 基于 RDD 实现的面向结构化数据的高阶抽象, 它将分布式的数据集以行列的方式组织起来，并提供了很多关系型操作的 API。Spark 在 1.6 版本还提供了 DataSet 的抽象，对 DataFrame 进行了扩展，支持面向对象的处理。而本质上 DataFrame 就是对象类型为 Row 的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark Dataframe">
+<meta property="og:url" content="http://example.com/2025/01/01/apache-spark/spark-dataframe/index.html">
+<meta property="og:site_name" content="唐长老的个人博客">
+<meta property="og:description" content="Spark DataFrameDataFrame 简介Spark DataFrame 是 Spark 基于 RDD 实现的面向结构化数据的高阶抽象, 它将分布式的数据集以行列的方式组织起来，并提供了很多关系型操作的 API。Spark 在 1.6 版本还提供了 DataSet 的抽象，对 DataFrame 进行了扩展，支持面向对象的处理。而本质上 DataFrame 就是对象类型为 Row 的">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-01-01T10:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-12T06:50:37.248Z">
+<meta property="article:author" content="唐长老">
+<meta property="article:tag" content="Spark">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>Spark Dataframe - 唐长老的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"C9jETuLwvCO4tHwlcXW2ueCa-gzGzoHsz","app_key":"ujYxRlBDWb8IcQmRmFaoOqAi","server_url":"https://c9jetulw.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>唐长老的个人博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Spark Dataframe"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-01-01 10:00" pubdate>
+          2025年1月1日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          8.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          73 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Spark Dataframe</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Spark-DataFrame"><a href="#Spark-DataFrame" class="headerlink" title="Spark DataFrame"></a>Spark DataFrame</h1><h2 id="DataFrame-简介"><a href="#DataFrame-简介" class="headerlink" title="DataFrame 简介"></a>DataFrame 简介</h2><p>Spark DataFrame 是 Spark 基于 <a href="spark-rdd.md">RDD</a> 实现的面向结构化数据的高阶抽象, 它将分布式的数据集以行列的方式组织起来，并提供了很多关系型操作的 API。<br><em>Spark 在 1.6 版本还提供了 DataSet 的抽象，对 DataFrame 进行了扩展，支持面向对象的处理。<br>而本质上 DataFrame 就是对象类型为 Row 的 DataSet, 因此在 Spark 2.0 之后将 DataFrame API 和 DataSet API 进行了统一， 即 DataFrame &#x3D; DataSet[Row]。</em>  </p>
+<h2 id="创建-DataFrame"><a href="#创建-DataFrame" class="headerlink" title="创建 DataFrame"></a>创建 DataFrame</h2><p>DataFrame 的创建方式有很多种，通过 RDD 创建、通过读取外部系统创建等<br>本篇文章的后续实践可在 spark-shell 中完成, 其中会默认实例化一个 SparkContext 实例 <code>sc</code> 和 SparkSession 实例 <code>spark</code>。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">spark-shell<br></code></pre></td></tr></table></figure>
+<h3 id="通过-Java-集合创建"><a href="#通过-Java-集合创建" class="headerlink" title="通过 Java 集合创建"></a>通过 Java 集合创建</h3><p>通过内存中的集合创建 DataFrame</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val scalaList = List(1 -&gt; &quot;A&quot;, 2 -&gt; &quot;B&quot;, 3 -&gt; &quot;C&quot;) <br>scalaList: List[(Int, String)] = List((1,A), (2,B), (3,C))<br><br>scala&gt; val df = spark.createDataFrame(scalaList)<br>df: org.apache.spark.sql.DataFrame = [_1: int, _2: string]<br><br>scala&gt; val withColNameDF = df.toDF(&quot;id&quot;, &quot;name&quot;)<br>withColNameDF: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; withColNameDF.show</span><br><span class="hljs-section">+---+----+</span><br><span class="hljs-section">| id|name|</span><br><span class="hljs-section">+---+----+</span><br>|  1|   A|<br>|  2|   B|<br><span class="hljs-section">|  3|   C|</span><br><span class="hljs-section">+---+----+</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="通过-RDD-创建"><a href="#通过-RDD-创建" class="headerlink" title="通过 RDD 创建"></a>通过 RDD 创建</h3><p>前面我们说过 DataFrame 是架构化的高阶抽象，因此为 Row 类型的 RDD 指定结构(schema)即可得到 DataFrame  </p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">scala&gt; <span class="hljs-keyword">import</span> org.apache.spark.<span class="hljs-keyword">sql</span>.<span class="hljs-keyword">Row</span><br>scala&gt; val rdd = sc.parallelize(List(<span class="hljs-keyword">Row</span>(<span class="hljs-number">1</span>, &quot;A&quot;), <span class="hljs-keyword">Row</span>(<span class="hljs-number">2</span>, &quot;B&quot;), <span class="hljs-keyword">Row</span>(<span class="hljs-number">3</span>, &quot;C&quot;)))<br><br>scala&gt; <span class="hljs-keyword">import</span> org.apache.spark.<span class="hljs-keyword">sql</span>.<span class="hljs-keyword">types</span>._<br>scala&gt; val schema = <span class="hljs-built_in">new</span> StructType() .<span class="hljs-keyword">add</span>(StructField(&quot;id&quot;, IntegerType)) .<span class="hljs-keyword">add</span>(StructField(&quot;name&quot;, StringType))<br><span class="hljs-keyword">schema</span>: org.apache.spark.<span class="hljs-keyword">sql</span>.<span class="hljs-keyword">types</span>.StructType = StructType(StructField(id,LongType,<span class="hljs-keyword">true</span>),StructField(<span class="hljs-type">name</span>,StringType,<span class="hljs-keyword">true</span>))<br><br>scala&gt; val df = spark.createDataFrame(rdd, <span class="hljs-keyword">schema</span>)<br>df: org.apache.spark.<span class="hljs-keyword">sql</span>.DataFrame = [id: , <span class="hljs-type">name</span>: string]<br><br>scala&gt; df.<span class="hljs-keyword">show</span>()<br>+<span class="hljs-comment">---+----+</span><br>| id|<span class="hljs-type">name</span>|<br>+<span class="hljs-comment">---+----+</span><br>|  <span class="hljs-number">1</span>|   A|<br>|  <span class="hljs-number">2</span>|   B|<br>|  <span class="hljs-number">3</span>|   C|<br>+<span class="hljs-comment">---+----+</span><br></code></pre></td></tr></table></figure>
+<h3 id="读取-Hive-表创建"><a href="#读取-Hive-表创建" class="headerlink" title="读取 Hive 表创建"></a>读取 Hive 表创建</h3><p>Spark 通过与 Hive 集成，即可轻松访问 Hive 中的表<br>假设 Hive 中有张 test 表, 那么 Spark 可以通过 <code>table</code> 或者 <code>sql</code> 方法来将表中的数据读取为 DataFrame  </p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">hive&gt; <span class="hljs-keyword">set</span> hive.cli.print.<span class="hljs-keyword">header</span>=<span class="hljs-keyword">true</span>;<br>hive&gt; <span class="hljs-keyword">select</span> * <span class="hljs-keyword">from</span> test_table;<br>OK<br>test_table.id	test_table.name<br><span class="hljs-number">1</span>	A<br><span class="hljs-number">2</span>	B<br><span class="hljs-number">3</span>	C<br></code></pre></td></tr></table></figure>
+<h4 id="table"><a href="#table" class="headerlink" title="table"></a>table</h4><p>指定表名，将整张表返回为 DataFrame </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.table(&quot;default.test_table&quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.show</span><br><span class="hljs-section">+---+----+</span><br><span class="hljs-section">| id|name|</span><br><span class="hljs-section">+---+----+</span><br>|  1|   A|<br>|  2|   B|<br><span class="hljs-section">|  3|   C|</span><br><span class="hljs-section">+---+----+</span><br></code></pre></td></tr></table></figure>
+<h4 id="sql"><a href="#sql" class="headerlink" title="sql"></a>sql</h4><p>执行 SQL 语句，将结果集返回为 DataFrame  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;SELECT * FROM default.test_table&quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.show</span><br><span class="hljs-section">+---+----+</span><br><span class="hljs-section">| id|name|</span><br><span class="hljs-section">+---+----+</span><br>|  1|   A|<br>|  2|   B|<br><span class="hljs-section">|  3|   C|</span><br><span class="hljs-section">+---+----+</span><br></code></pre></td></tr></table></figure>
+<h3 id="读取外部系统"><a href="#读取外部系统" class="headerlink" title="读取外部系统"></a>读取外部系统</h3><h4 id="通过-jdbc-读取数据库"><a href="#通过-jdbc-读取数据库" class="headerlink" title="通过 jdbc 读取数据库"></a>通过 jdbc 读取数据库</h4><p>通过 jdbc 协议将数据从外部数据库系统如 MySQL&#x2F;Postgres 等读取为 DataFrame<br>本例子中先将 DataFrame 通过 <a href="#jdbc">jdbc</a> 写入 MySQL 后，再从 MySQL 中读取数据，需要使用 MySQL 驱动来连接本地的 MySQL 数据库，因此需要将相应的驱动包加入 classpath，比如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">spark-shell --packages &quot;mysql:mysql-connector-java:8.0.28&quot; <br></code></pre></td></tr></table></figure>
+
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(1, 2, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; val connectionProperties = new java.util.Properties()<br>scala&gt; connectionProperties.put(&quot;user&quot;, &quot;root&quot;)<br>scala&gt; connectionProperties.put(&quot;password&quot;, &quot;123456&quot;)<br>scala&gt; connectionProperties.put(&quot;driver&quot;, &quot;com.mysql.jdbc.Driver&quot;)<br><br>scala&gt; df.write.jdbc(<br><span class="hljs-code">  url=&quot;jdbc:mysql://localhost:3306/test?createDatabaseIfNotExist=true&quot;, </span><br><span class="hljs-code">  table=&quot;test_table__jdbc&quot;,</span><br><span class="hljs-code">  connectionProperties=connectionProperties</span><br>)<br><br>scala&gt; spark.read.jdbc(<br><span class="hljs-code">  url=&quot;jdbc:mysql://localhost:3306/test?createDatabaseIfNotExist=true&quot;, </span><br><span class="hljs-code">  table=&quot;test_table__jdbc&quot;,</span><br><span class="hljs-code">  properties=connectionProperties</span><br><span class="hljs-section">).show</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  2|Name2|<br>|  1|Name1|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="读取外部文件系统"><a href="#读取外部文件系统" class="headerlink" title="读取外部文件系统"></a>读取外部文件系统</h4><p>从外部文件系统（如 HDFS，S3等）将数据读取为 DataFrame<br>本例子中先将 DataFrame 通过 <a href="#csv">csv</a> 写入 HDFS 后，再从 HDFS 中读取数据  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; df.write.mode(&quot;overwrite&quot;).option(&quot;header&quot;, &quot;true&quot;).csv(&quot;hdfs:///test_write/test_csv&quot;)<br><br><span class="hljs-section">scala&gt; spark.read.format(&quot;csv&quot;).option(&quot;header&quot;, &quot;true&quot;).load(&quot;hdfs:///test_write/test_csv&quot;).show</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br></code></pre></td></tr></table></figure>
+
+
+<h2 id="Transformation-算子"><a href="#Transformation-算子" class="headerlink" title="Transformation 算子"></a>Transformation 算子</h2><h3 id="基础转换"><a href="#基础转换" class="headerlink" title="基础转换"></a>基础转换</h3><h4 id="select"><a href="#select" class="headerlink" title="select"></a>select</h4><p>选择一组列，或基于列的函数</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;select 1 as id, <span class="hljs-emphasis">&#x27;A&#x27;</span> as name&quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.select(df(&quot;id&quot;), df(&quot;name&quot;), org.apache.spark.sql.functions.lower(df(&quot;name&quot;)) as &quot;lower_name&quot; ).show</span><br><span class="hljs-section">+---+----+----------+</span><br><span class="hljs-section">| id|name|lower_name|</span><br><span class="hljs-section">+---+----+----------+</span><br><span class="hljs-section">|  1|   A|         a|</span><br><span class="hljs-section">+---+----+----------+</span><br></code></pre></td></tr></table></figure>
+<h4 id="selectExpr"><a href="#selectExpr" class="headerlink" title="selectExpr"></a>selectExpr</h4><p>选择一组列，或基于列的 SQL 表达式</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;SELECT 1 AS id, <span class="hljs-emphasis">&#x27;A&#x27;</span> AS name&quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.selectExpr(&quot;id&quot;, &quot;name&quot;, &quot;LOWER(name) as lower_name&quot; ).show</span><br><span class="hljs-section">+---+----+----------+</span><br><span class="hljs-section">| id|name|lower_name|</span><br><span class="hljs-section">+---+----+----------+</span><br><span class="hljs-section">|  1|   A|         a|</span><br><span class="hljs-section">+---+----+----------+</span><br></code></pre></td></tr></table></figure>
+<h4 id="filter"><a href="#filter" class="headerlink" title="filter"></a>filter</h4><p>根据指定的条件函数过滤出符合条件的数据, 过滤条件也可以是 SQL 表达式</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;SELECT 1 AS id, <span class="hljs-emphasis">&#x27;A&#x27;</span> AS name UNION SELECT 2 AS id, <span class="hljs-emphasis">&#x27;B&#x27;</span> AS name &quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.filter(df(&quot;id&quot;) &gt; 1).show()</span><br><span class="hljs-section">+---+----+</span><br><span class="hljs-section">| id|name|</span><br><span class="hljs-section">+---+----+</span><br><span class="hljs-section">|  2|   B|</span><br><span class="hljs-section">+---+----+</span><br><br><span class="hljs-section">scala&gt; df.filter(&quot;id &gt; 1&quot;).show()</span><br><span class="hljs-section">+---+----+</span><br><span class="hljs-section">| id|name|</span><br><span class="hljs-section">+---+----+</span><br><span class="hljs-section">|  2|   B|</span><br><span class="hljs-section">+---+----+</span><br></code></pre></td></tr></table></figure>
+<h4 id="where"><a href="#where" class="headerlink" title="where"></a>where</h4><p>与 <a href="#filter">filter</a> 行为一致，提供与 SQL 语义一致的同名算子</p>
+<h4 id="sort"><a href="#sort" class="headerlink" title="sort"></a>sort</h4><p>根据指定的列对数据进行排序  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;SELECT 1 AS id, <span class="hljs-emphasis">&#x27;A&#x27;</span> AS name UNION SELECT 2 AS id, <span class="hljs-emphasis">&#x27;B&#x27;</span> AS name &quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.sort(df(&quot;id&quot;).desc).show()</span><br><span class="hljs-section">+---+----+</span><br><span class="hljs-section">| id|name|</span><br><span class="hljs-section">+---+----+</span><br>|  2|   B|<br><span class="hljs-section">|  1|   A|</span><br><span class="hljs-section">+---+----+</span><br></code></pre></td></tr></table></figure>
+<h4 id="orderBy"><a href="#orderBy" class="headerlink" title="orderBy"></a>orderBy</h4><p>与 <a href="#sort">sort</a> 行为一致，提供与 SQL 语义一致的同名算子  </p>
+<h4 id="na"><a href="#na" class="headerlink" title="na"></a>na</h4><h4 id="stat"><a href="#stat" class="headerlink" title="stat"></a>stat</h4><h4 id="hint"><a href="#hint" class="headerlink" title="hint"></a>hint</h4><h4 id="as"><a href="#as" class="headerlink" title="as"></a>as</h4><p>为 DataFrame 定义别名  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;SELECT 1 AS id, <span class="hljs-emphasis">&#x27;A&#x27;</span> AS name UNION SELECT 2 AS id, <span class="hljs-emphasis">&#x27;B&#x27;</span> AS name &quot;).as(&quot;aliasOfDF&quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.filter(&quot;aliasOfDF.id &gt; 1&quot;).show()</span><br><span class="hljs-section">+---+----+</span><br><span class="hljs-section">| id|name|</span><br><span class="hljs-section">+---+----+</span><br><span class="hljs-section">|  2|   B|</span><br><span class="hljs-section">+---+----+</span><br></code></pre></td></tr></table></figure>
+<h4 id="alias"><a href="#alias" class="headerlink" title="alias"></a>alias</h4><p>与 <a href="#as-">as</a> 语义一致  </p>
+<h4 id="to"><a href="#to" class="headerlink" title="to"></a>to</h4><p>将 DataFrame 转换为具有给定 schema 的新 DataFrame</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;SELECT 1 AS id, <span class="hljs-emphasis">&#x27;A&#x27;</span> AS name UNION SELECT 2 AS id, <span class="hljs-emphasis">&#x27;B&#x27;</span> AS name &quot;).as(&quot;aliasOfDF&quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br>scala&gt; val schema = new StructType().add(StructField(&quot;name&quot;, StringType)).add(StructField(&quot;id&quot;, IntegerType)) <br>schema: org.apache.spark.sql.types.StructType = StructType(StructField(name,StringType,true),StructField(id,IntegerType,true))<br><br><span class="hljs-section">scala&gt; df.to(schema).show</span><br><span class="hljs-section">+----+---+</span><br><span class="hljs-section">|name| id|</span><br><span class="hljs-section">+----+---+</span><br>|   A|  1|<br><span class="hljs-section">|   B|  2|</span><br><span class="hljs-section">+----+---+</span><br><br></code></pre></td></tr></table></figure>
+<h4 id="toDF"><a href="#toDF" class="headerlink" title="toDF"></a>toDF</h4><p>将 DataFrame 转换为具有指定的列名的新的 DataFrame  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;SELECT 1 AS id, <span class="hljs-emphasis">&#x27;A&#x27;</span> AS name UNION SELECT 2 AS id, <span class="hljs-emphasis">&#x27;B&#x27;</span> AS name &quot;).as(&quot;aliasOfDF&quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.toDF(&quot;name&quot;, &quot;id&quot;).show</span><br><span class="hljs-section">+----+---+</span><br><span class="hljs-section">|name| id|</span><br><span class="hljs-section">+----+---+</span><br>|   1|  A|<br><span class="hljs-section">|   2|  B|</span><br><span class="hljs-section">+----+---+</span><br></code></pre></td></tr></table></figure>
+<h4 id="unpivot"><a href="#unpivot" class="headerlink" title="unpivot"></a>unpivot</h4><p>列转行, 将 DataFrame 的每条记录的每一列转为单独的行  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String, age: Int)<br>scala&gt; val persons = List(Person(1, &quot;Tom&quot;, 30), Person(2, &quot;Jerry&quot;, 28))<br>persons: List[Person] = List(Person(1,Tom,30), Person(2,Jerry,28))<br><br>scala&gt; val df = spark.createDataFrame(persons)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string ... 1 more field]<br><br><span class="hljs-section">scala&gt; df.show</span><br><span class="hljs-section">+---+-----+---+</span><br><span class="hljs-section">| id| name|age|</span><br><span class="hljs-section">+---+-----+---+</span><br>|  1|  Tom| 30|<br><span class="hljs-section">|  2|Jerry| 28|</span><br><span class="hljs-section">+---+-----+---+</span><br><br>scala&gt; val unpivotedDF = df.unpivot(ids=Array(df(&quot;id&quot;)), values=Array(df(&quot;name&quot;), df(&quot;age&quot;).cast(&quot;string&quot;)), variableColumnName=&quot;k&quot;, valueColumnName=&quot;v&quot;)<br>unpivotedDF: org.apache.spark.sql.DataFrame = [id: int, k: string ... 1 more field]<br><br><span class="hljs-section">scala&gt; unpivotedDF.show</span><br><span class="hljs-section">+---+----+-----+</span><br><span class="hljs-section">| id|   k|    v|</span><br><span class="hljs-section">+---+----+-----+</span><br>|  1|name|  Tom|<br>|  1| age|   30|<br>|  2|name|Jerry|<br><span class="hljs-section">|  2| age|   28|</span><br><span class="hljs-section">+---+----+-----+</span><br></code></pre></td></tr></table></figure>
+<h4 id="melt"><a href="#melt" class="headerlink" title="melt"></a>melt</h4><p>与 <a href="#unpivot-">unpivot</a> 语义一致  </p>
+<h4 id="withColumn"><a href="#withColumn" class="headerlink" title="withColumn"></a>withColumn</h4><p>根据现有的列或基于现有列的函数，添加或替换一个指定名称的列  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;SELECT 1 AS id, <span class="hljs-emphasis">&#x27;A&#x27;</span> AS name&quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.withColumn(&quot;id_copy&quot;, df(&quot;id&quot;)).withColumn(&quot;lower_name&quot;, org.apache.spark.sql.functions.lower(df(&quot;name&quot;))).show</span><br><span class="hljs-section">+---+----+-------+----------+</span><br><span class="hljs-section">| id|name|id_copy|lower_name|</span><br><span class="hljs-section">+---+----+-------+----------+</span><br><span class="hljs-section">|  1|   A|      1|         a|</span><br><span class="hljs-section">+---+----+-------+----------+</span><br></code></pre></td></tr></table></figure>
+<h4 id="withColumnRenamed"><a href="#withColumnRenamed" class="headerlink" title="withColumnRenamed"></a>withColumnRenamed</h4><p>重命名现有的列  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;SELECT 1 AS id, <span class="hljs-emphasis">&#x27;A&#x27;</span> AS name&quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.withColumnRenamed(&quot;id&quot;, &quot;new_id&quot;).show</span><br><span class="hljs-section">+------+----+</span><br><span class="hljs-section">|new_id|name|</span><br><span class="hljs-section">+------+----+</span><br><span class="hljs-section">|     1|   A|</span><br><span class="hljs-section">+------+----+</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="withColumns"><a href="#withColumns" class="headerlink" title="withColumns"></a>withColumns</h4><p>对多个列执行 <a href="#withcolumn">withColumn</a> 操作, 入参是 <code>新列名</code> -&gt; <code>现有列或基于现有列的函数</code> 的 Map</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;SELECT 1 AS id, <span class="hljs-emphasis">&#x27;A&#x27;</span> AS name&quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.withColumns(Map(&quot;id_copy&quot; -&gt; df(&quot;id&quot;), &quot;lower_name&quot; -&gt; org.apache.spark.sql.functions.lower(df(&quot;name&quot;)))).show</span><br><span class="hljs-section">+---+----+-------+----------+</span><br><span class="hljs-section">| id|name|id_copy|lower_name|</span><br><span class="hljs-section">+---+----+-------+----------+</span><br><span class="hljs-section">|  1|   A|      1|         a|</span><br><span class="hljs-section">+---+----+-------+----------+</span><br></code></pre></td></tr></table></figure>
+<h4 id="withColumnsRenamed"><a href="#withColumnsRenamed" class="headerlink" title="withColumnsRenamed"></a>withColumnsRenamed</h4><p>重命名多个现有的列, 入参是 <code>现有列的名称</code> -&gt; <code>新列名</code> 的 Map</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;SELECT 1 AS id, <span class="hljs-emphasis">&#x27;A&#x27;</span> AS name&quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.withColumnsRenamed(Map(&quot;id&quot;-&gt; &quot;new_id&quot;, &quot;name&quot; -&gt; &quot;new_name&quot;)).show</span><br><span class="hljs-section">+------+--------+</span><br><span class="hljs-section">|new_id|new_name|</span><br><span class="hljs-section">+------+--------+</span><br><span class="hljs-section">|     1|       A|</span><br><span class="hljs-section">+------+--------+</span><br></code></pre></td></tr></table></figure>
+<h4 id="drop"><a href="#drop" class="headerlink" title="drop"></a>drop</h4><p>移除指定的列  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;SELECT 1 AS id, <span class="hljs-emphasis">&#x27;A&#x27;</span> AS name&quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.drop(&quot;id&quot;).show()</span><br><span class="hljs-section">+----+</span><br><span class="hljs-section">|name|</span><br><span class="hljs-section">+----+</span><br><span class="hljs-section">|   A|</span><br><span class="hljs-section">+----+</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="transform"><a href="#transform" class="headerlink" title="transform"></a>transform</h4><p>对当前的 DataFrame 作转换，根据传入的 DataFrame &#x3D;&gt; DataFrame 函数，返回新的 DataFrame </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;SELECT 1 AS id, <span class="hljs-emphasis">&#x27;A&#x27;</span> AS name&quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.transform(_df =&gt; df.drop(&quot;id&quot;)).show</span><br><span class="hljs-section">+----+</span><br><span class="hljs-section">|name|</span><br><span class="hljs-section">+----+</span><br><span class="hljs-section">|   A|</span><br><span class="hljs-section">+----+</span><br></code></pre></td></tr></table></figure>
+<h4 id="map"><a href="#map" class="headerlink" title="map"></a>map</h4><p>对 DataFrame 的每一行 row 作转换, 入参是 row &#x3D;&gt; row 的映射函数  </p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">scala&gt; val df = spark.<span class="hljs-keyword">sql</span>(&quot;SELECT 1 AS id, &#x27;A&#x27; AS name&quot;)<br>df: org.apache.spark.<span class="hljs-keyword">sql</span>.DataFrame = [id: <span class="hljs-type">int</span>, <span class="hljs-type">name</span>: string]<br><br>scala&gt; df.map(<span class="hljs-keyword">row</span> =&gt; &quot;prefix_&quot; + <span class="hljs-keyword">row</span>.getAs[String](&quot;name&quot;)).<span class="hljs-keyword">show</span><br>+<span class="hljs-comment">--------+</span><br>|   <span class="hljs-keyword">value</span>|<br>+<span class="hljs-comment">--------+</span><br>|prefix_A|<br>+<span class="hljs-comment">--------+</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="flatMap"><a href="#flatMap" class="headerlink" title="flatMap"></a>flatMap</h4><p>对 DataFrame 的 Array 列作转换, 并将每个元素展开成单独的行, 入参是 arrayItem &#x3D;&gt; arrayItem 的映射函数</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;SELECT ARRAY(1, 2, 3) as array_column&quot;)<br><br>scala&gt; df.flatMap(row =&gt; row.getAs[Seq[Int]](&quot;array_column&quot;).map(_ * 2)).show<br><span class="hljs-code">+-----+</span><br><span class="hljs-section">|value|</span><br><span class="hljs-section">+-----+</span><br>|    2|<br>|    4|<br><span class="hljs-section">|    6|</span><br><span class="hljs-section">+-----+</span><br></code></pre></td></tr></table></figure>
+<h4 id="toJSON"><a href="#toJSON" class="headerlink" title="toJSON"></a>toJSON</h4><p>对 DataFrame 的每一行 row 转换为 JSON 字符串  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; val df = spark.sql(&quot;SELECT 1 AS id, <span class="hljs-emphasis">&#x27;A&#x27;</span> AS name UNION SELECT 2, <span class="hljs-emphasis">&#x27;B&#x27;</span>&quot;)<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.toJSON.show</span><br><span class="hljs-section">+-------------------+</span><br><span class="hljs-section">|              value|</span><br><span class="hljs-section">+-------------------+</span><br>|&#123;&quot;id&quot;:1,&quot;name&quot;:&quot;A&quot;&#125;|<br><span class="hljs-section">|&#123;&quot;id&quot;:2,&quot;name&quot;:&quot;B&quot;&#125;|</span><br><span class="hljs-section">+-------------------+</span><br></code></pre></td></tr></table></figure>
+
+
+<h3 id="分区转换"><a href="#分区转换" class="headerlink" title="分区转换"></a>分区转换</h3><h4 id="sortWithinPartitions"><a href="#sortWithinPartitions" class="headerlink" title="sortWithinPartitions"></a>sortWithinPartitions</h4><p>对每个 Partition 中的数据进行排序，与 SQL 中的 <code>sort by</code> 语义一致 </p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val persons = (1 to 6).toList.map(x =&gt; Person(x, <span class="hljs-string">&quot;Name&quot;</span> + x))<br>persons: List[Person] = List(Person(1,Name1), Person(2,Name2), Person(3,Name3), Person(4,Name4), Person(5,Name5), Person(6,Name6))<br><br>scala&gt; val df = sc.parallelize(persons, 2).toDF<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string ... 1 more field]<br><br>scala&gt; val sortedDF = df.sortWithinPartitions(df(<span class="hljs-string">&quot;id&quot;</span>).desc)<br>sortedDF: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] = [id: int, name: string]<br><br>scala&gt; sortedDF.withColumn(<span class="hljs-string">&quot;partition_id&quot;</span>, org.apache.spark.sql.functions.spark_partition_id()).show<br>+---+-----+------------+<br>|<span class="hljs-string"> id</span>|<span class="hljs-string"> name</span>|<span class="hljs-string">partition_id</span>|<br>+---+-----+------------+<br>|<span class="hljs-string">  3</span>|<span class="hljs-string">Name3</span>|<span class="hljs-string">           0</span>|<br>|<span class="hljs-string">  2</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">           0</span>|<br>|<span class="hljs-string">  1</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string">           0</span>|<br>|<span class="hljs-string">  6</span>|<span class="hljs-string">Name6</span>|<span class="hljs-string">           1</span>|<br>|<span class="hljs-string">  5</span>|<span class="hljs-string">Name5</span>|<span class="hljs-string">           1</span>|<br>|<span class="hljs-string">  4</span>|<span class="hljs-string">Name4</span>|<span class="hljs-string">           1</span>|<br>+---+-----+------------+<br></code></pre></td></tr></table></figure>
+<h4 id="mapPartitions"><a href="#mapPartitions" class="headerlink" title="mapPartitions"></a>mapPartitions</h4><p>对 DataFrame 的每一个分区做转换操作，每个分区中的记录被封装成一个迭代器，因此这个转换函数应是 iterator &#x3D;&gt; iterator 的映射</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">scala&gt; case class Person(id: Int, name: String)<br><br>scala&gt; val df =  spark.createDataFrame((1 to 6).toList.map(x =&gt; Person(x, <span class="hljs-string">&quot;Name&quot;</span> + x)))<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string ... 1 more field]<br><br>scala&gt; val transformed = df.mapPartitions&#123; iter =&gt; val salt = <span class="hljs-string">&quot;abcd_&quot;</span>; iter.map( row =&gt; salt + row.getAs(<span class="hljs-string">&quot;name&quot;</span>)) &#125;<br>transformed: org.apache.spark.sql.Dataset[String] = [value: string]<br><br>scala&gt; transformed.withColumn(<span class="hljs-string">&quot;partition_id&quot;</span>, org.apache.spark.sql.functions.spark_partition_id()).show<br>+----------+------------+<br>|<span class="hljs-string">     value</span>|<span class="hljs-string">partition_id</span>|<br>+----------+------------+<br>|<span class="hljs-string">abcd_Name1</span>|<span class="hljs-string">           0</span>|<br>|<span class="hljs-string">abcd_Name2</span>|<span class="hljs-string">           1</span>|<br>|<span class="hljs-string">abcd_Name3</span>|<span class="hljs-string">           2</span>|<br>|<span class="hljs-string">abcd_Name4</span>|<span class="hljs-string">           3</span>|<br>|<span class="hljs-string">abcd_Name5</span>|<span class="hljs-string">           4</span>|<br>|<span class="hljs-string">abcd_Name6</span>|<span class="hljs-string">           5</span>|<br>+----------+------------+<br></code></pre></td></tr></table></figure>
+
+<h4 id="repartition"><a href="#repartition" class="headerlink" title="repartition"></a>repartition</h4><p>调整 DataFrame 的分区到目标数量，与 <a href="spark-rdd.md#repartition">RDD - repartition</a> 的行为一致  </p>
+<h4 id="coalesce"><a href="#coalesce" class="headerlink" title="coalesce"></a>coalesce</h4><p>减少 DataFrame 的分区到目标数量，与 <a href="spark-rdd.md#coalesce">RDD - coalesce</a> 的行为一致</p>
+<h4 id="repartitionByRange"><a href="#repartitionByRange" class="headerlink" title="repartitionByRange"></a>repartitionByRange</h4><p>调整 DataFrame 的分区到目标数量，对数据进行随机重新分布，会产生 Shuffle，重分布的过程将按指定列进行区间采样并进行区间排序（默认升序，空值优先），<br>因为采样可能返回不同的结果，故多次 repartitionByRange 的最终结果有可能不一致</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">scala&gt; case class Person(id: Int, name: String)<br><br>scala&gt; val df =  spark.createDataFrame((1 to 6).toList.map(x =&gt; Person(x, <span class="hljs-string">&quot;Name&quot;</span> + x)))<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string ... 1 more field]<br><br>scala&gt; df.repartitionByRange(3, $<span class="hljs-string">&quot;id&quot;</span>).withColumn(<span class="hljs-string">&quot;partition_id&quot;</span>, org.apache.spark.sql.functions.spark_partition_id()).show<br>+---+-----+------------+<br>|<span class="hljs-string"> id</span>|<span class="hljs-string"> name</span>|<span class="hljs-string">partition_id</span>|<br>+---+-----+------------+<br>|<span class="hljs-string">  1</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string">           0</span>|<br>|<span class="hljs-string">  2</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">           0</span>|<br>|<span class="hljs-string">  3</span>|<span class="hljs-string">Name3</span>|<span class="hljs-string">           1</span>|<br>|<span class="hljs-string">  4</span>|<span class="hljs-string">Name4</span>|<span class="hljs-string">           1</span>|<br>|<span class="hljs-string">  5</span>|<span class="hljs-string">Name5</span>|<span class="hljs-string">           2</span>|<br>|<span class="hljs-string">  6</span>|<span class="hljs-string">Name6</span>|<span class="hljs-string">           2</span>|<br>+---+-----+------------+<br>scala&gt; df.repartitionByRange(3, $<span class="hljs-string">&quot;id&quot;</span>.desc).withColumn(<span class="hljs-string">&quot;partition_id&quot;</span>, org.apache.spark.sql.functions.spark_partition_id()).show<br>+---+-----+------------+<br>|<span class="hljs-string"> id</span>|<span class="hljs-string"> name</span>|<span class="hljs-string">partition_id</span>|<br>+---+-----+------------+<br>|<span class="hljs-string">  5</span>|<span class="hljs-string">Name5</span>|<span class="hljs-string">           0</span>|<br>|<span class="hljs-string">  6</span>|<span class="hljs-string">Name6</span>|<span class="hljs-string">           0</span>|<br>|<span class="hljs-string">  3</span>|<span class="hljs-string">Name3</span>|<span class="hljs-string">           1</span>|<br>|<span class="hljs-string">  4</span>|<span class="hljs-string">Name4</span>|<span class="hljs-string">           1</span>|<br>|<span class="hljs-string">  1</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string">           2</span>|<br>|<span class="hljs-string">  2</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">           2</span>|<br>+---+-----+------------+<br></code></pre></td></tr></table></figure>
+
+
+<h3 id="集合运算"><a href="#集合运算" class="headerlink" title="集合运算"></a>集合运算</h3><h4 id="join"><a href="#join" class="headerlink" title="join"></a>join</h4><p>将当前 DataFrame 与另一个 DataFrame 关联，需要自定关联类型，默认为 Inner</p>
+<h5 id="Inner-Join"><a href="#Inner-Join" class="headerlink" title="Inner Join"></a>Inner Join</h5><p>将当前 DataFrame 与另外的 DataFrame 进行内关联, 结果集中仅包含左右 DataFrame 中的能匹配上的记录, 相同关联键存在重复数据时，将返回其笛卡尔积<br>joinType 为 <code>inner</code> 即表示 Inner Join</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br><br>scala&gt; val df1 = spark.createDataFrame(Seq(Person(1, &quot;Name1&quot;), Person(2, &quot;Name2&quot;), Person(3, &quot;Name3&quot;)))<br>df1: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br>scala&gt; val df2 = spark.createDataFrame(Seq(Person(1, &quot;Name1&quot;), Person(2, &quot;Name2&quot;), Person(2, &quot;Name22&quot;), Person(4, &quot;Name4&quot;)))<br><br><span class="hljs-section">scala&gt; df1.join(df2, &quot;id&quot;, joinType=&quot;inner&quot;).show</span><br><span class="hljs-section">+---+-----+------+</span><br><span class="hljs-section">| id| name|  name|</span><br><span class="hljs-section">+---+-----+------+</span><br>|  1|Name1| Name1|<br>|  2|Name2| Name2|<br><span class="hljs-section">|  2|Name2|Name22|</span><br><span class="hljs-section">+---+-----+------+</span><br><br><span class="hljs-section">scala&gt; df1.join(df2, df1(&quot;id&quot;) === df2(&quot;id&quot;)).show</span><br><span class="hljs-section">+---+-----+---+------+</span><br><span class="hljs-section">| id| name| id|  name|</span><br><span class="hljs-section">+---+-----+---+------+</span><br>|  1|Name1|  1| Name1|<br>|  2|Name2|  2| Name2|<br><span class="hljs-section">|  2|Name2|  2|Name22|</span><br><span class="hljs-section">+---+-----+---+------+</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="Full-Join"><a href="#Full-Join" class="headerlink" title="Full Join"></a>Full Join</h5><p>将当前 DataFrame 与另外的 DataFrame 进行全关联, 结果集中将包含左右 DataFrame 中的全部记录，匹配不到的数据置为空<br>joinType 为 <code>outer</code>, <code>full</code>, <code>fullouter</code>, <code>full_outer</code> 均表示 Full Join  </p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">scala&gt; case class Person(id: Int, name: String)<br><br>scala&gt; val df1 = spark.createDataFrame(Seq(Person(1, <span class="hljs-string">&quot;Name1&quot;</span>), Person(2, <span class="hljs-string">&quot;Name2&quot;</span>), Person(3, <span class="hljs-string">&quot;Name3&quot;</span>)))<br>df1: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br>scala&gt; val df2 = spark.createDataFrame(Seq(Person(1, <span class="hljs-string">&quot;Name1&quot;</span>), Person(2, <span class="hljs-string">&quot;Name2&quot;</span>), Person(2, <span class="hljs-string">&quot;Name22&quot;</span>), Person(4, <span class="hljs-string">&quot;Name4&quot;</span>)))<br><br>scala&gt; df1.join(df2, <span class="hljs-string">&quot;id&quot;</span>, joinType=<span class="hljs-string">&quot;full&quot;</span>).show<br>+---+-----+------+<br>|<span class="hljs-string"> id</span>|<span class="hljs-string"> name</span>|<span class="hljs-string">  name</span>|<br>+---+-----+------+<br>|<span class="hljs-string">  1</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string"> Name1</span>|<br>|<span class="hljs-string">  2</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string"> Name2</span>|<br>|<span class="hljs-string">  2</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">Name22</span>|<br>|<span class="hljs-string">  3</span>|<span class="hljs-string">Name3</span>|<span class="hljs-string">  NULL</span>|<br>|<span class="hljs-string">  4</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string"> Name4</span>|<br>+---+-----+------+<br></code></pre></td></tr></table></figure>
+<h5 id="Left-Join"><a href="#Left-Join" class="headerlink" title="Left Join"></a>Left Join</h5><p>将当前 DataFrame 与另外的 DataFrame 进行左关联, 结果集中仅包含左 DataFrame 中的全部记录，右 DataFrame 中匹配不到的数据置为空<br>joinType 为 <code>leftouter</code>, <code>left</code>, <code>left_outer</code> 均表示 Left Join</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br><br>scala&gt; val df1 = spark.createDataFrame(Seq(Person(1, &quot;Name1&quot;), Person(2, &quot;Name2&quot;), Person(3, &quot;Name3&quot;)))<br>df1: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br>scala&gt; val df2 = spark.createDataFrame(Seq(Person(1, &quot;Name1&quot;), Person(2, &quot;Name2&quot;), Person(2, &quot;Name22&quot;), Person(4, &quot;Name4&quot;)))<br><br><span class="hljs-section">scala&gt; df1.join(df2, &quot;id&quot;, joinType=&quot;left&quot;).show</span><br><span class="hljs-section">+---+-----+------+</span><br><span class="hljs-section">| id| name|  name|</span><br><span class="hljs-section">+---+-----+------+</span><br>|  1|Name1| Name1|<br>|  2|Name2|Name22|<br>|  2|Name2| Name2|<br><span class="hljs-section">|  3|Name3|  NULL|</span><br><span class="hljs-section">+---+-----+------+</span><br></code></pre></td></tr></table></figure>
+<h5 id="Right-Join"><a href="#Right-Join" class="headerlink" title="Right Join"></a>Right Join</h5><p>将当前 DataFrame 与另外的 DataFrame 进行右关联, 结果集中仅包含右 DataFrame 中的全部记录，左 DataFrame 中匹配不到的数据置为空<br>joinType 为 <code>rightouter</code>, <code>right</code>, <code>right_outer</code> 均表示 Right Join</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br><br>scala&gt; val df1 = spark.createDataFrame(Seq(Person(1, &quot;Name1&quot;), Person(2, &quot;Name2&quot;), Person(3, &quot;Name3&quot;)))<br>df1: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br>scala&gt; val df2 = spark.createDataFrame(Seq(Person(1, &quot;Name1&quot;), Person(2, &quot;Name2&quot;), Person(2, &quot;Name22&quot;), Person(4, &quot;Name4&quot;)))<br><br><span class="hljs-section">scala&gt; df1.join(df2, &quot;id&quot;, joinType=&quot;right&quot;).show</span><br><span class="hljs-section">+---+-----+------+</span><br><span class="hljs-section">| id| name|  name|</span><br><span class="hljs-section">+---+-----+------+</span><br>|  1|Name1| Name1|<br>|  2|Name2| Name2|<br>|  2|Name2|Name22|<br><span class="hljs-section">|  4| NULL| Name4|</span><br><span class="hljs-section">+---+-----+------+</span><br></code></pre></td></tr></table></figure>
+<h5 id="Semi-Join"><a href="#Semi-Join" class="headerlink" title="Semi Join"></a>Semi Join</h5><p>将当前 DataFrame 与另外的 DataFrame 进行(左)半关联, 结果集中仅包含左右 DataFrame 中的能匹配上的记录，并且右表中存在重复时，仅返回第一条记录。<br>joinType 为 <code>leftsemi</code>, <code>semi</code>, <code>left_semi</code> 均表示 Semi Join</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br><br>scala&gt; val df1 = spark.createDataFrame(Seq(Person(1, &quot;Name1&quot;), Person(2, &quot;Name2&quot;), Person(3, &quot;Name3&quot;)))<br>df1: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br>scala&gt; val df2 = spark.createDataFrame(Seq(Person(1, &quot;Name1&quot;), Person(2, &quot;Name2&quot;), Person(2, &quot;Name22&quot;), Person(4, &quot;Name4&quot;)))<br><br><span class="hljs-section">scala&gt; df1.join(df2, &quot;id&quot;, joinType=&quot;semi&quot;).show</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br><span class="hljs-section">|  2|Name2|</span><br><span class="hljs-section">+---+-----+</span><br></code></pre></td></tr></table></figure>
+<h5 id="Anti-Join"><a href="#Anti-Join" class="headerlink" title="Anti Join"></a>Anti Join</h5><p>将当前 DataFrame 与另外的 DataFrame 进行(左)反关联, 结果集中仅包含左 DataFrame 中与右 DataFrame 匹配不上的记录。 相当于用右 DF 对左 DF 求差集。<br>joinType 为 <code>leftanti</code>, <code>anti</code>, <code>left_anti</code> 均表示 Anti Join</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; case class <span class="hljs-built_in">Person</span>(id: Int, name: String)<br><br>scala&gt; val df1 = spark<span class="hljs-selector-class">.createDataFrame</span>(<span class="hljs-built_in">Seq</span>(<span class="hljs-built_in">Person</span>(<span class="hljs-number">1</span>, <span class="hljs-string">&quot;Name1&quot;</span>), <span class="hljs-built_in">Person</span>(<span class="hljs-number">2</span>, <span class="hljs-string">&quot;Name2&quot;</span>), <span class="hljs-built_in">Person</span>(<span class="hljs-number">3</span>, <span class="hljs-string">&quot;Name3&quot;</span>)))<br>df1: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.sql</span><span class="hljs-selector-class">.DataFrame</span> = <span class="hljs-selector-attr">[id: int, name: string]</span><br><br>scala&gt; val df2 = spark<span class="hljs-selector-class">.createDataFrame</span>(<span class="hljs-built_in">Seq</span>(<span class="hljs-built_in">Person</span>(<span class="hljs-number">1</span>, <span class="hljs-string">&quot;Name1&quot;</span>), <span class="hljs-built_in">Person</span>(<span class="hljs-number">2</span>, <span class="hljs-string">&quot;Name2&quot;</span>), <span class="hljs-built_in">Person</span>(<span class="hljs-number">2</span>, <span class="hljs-string">&quot;Name22&quot;</span>), <span class="hljs-built_in">Person</span>(<span class="hljs-number">4</span>, <span class="hljs-string">&quot;Name4&quot;</span>)))<br><br>scala&gt; df1<span class="hljs-selector-class">.join</span>(df2, <span class="hljs-string">&quot;id&quot;</span>, joinType=<span class="hljs-string">&quot;full&quot;</span>).show<br></code></pre></td></tr></table></figure>
+<h4 id="crossJoin"><a href="#crossJoin" class="headerlink" title="crossJoin"></a>crossJoin</h4><p>将当前 DataFrame 与另外的 DataFrame 进行关联, 返回笛卡尔积  </p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">scala&gt; case class Person(id: Int, name: String)<br><br>scala&gt; val df1 = spark.createDataFrame(Seq(Person(1, <span class="hljs-string">&quot;Name1&quot;</span>), Person(2, <span class="hljs-string">&quot;Name2&quot;</span>), Person(3, <span class="hljs-string">&quot;Name3&quot;</span>)))<br>df1: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br>scala&gt; val df2 = spark.createDataFrame(Seq(Person(1, <span class="hljs-string">&quot;Name1&quot;</span>), Person(2, <span class="hljs-string">&quot;Name2&quot;</span>), Person(2, <span class="hljs-string">&quot;Name22&quot;</span>), Person(4, <span class="hljs-string">&quot;Name4&quot;</span>)))<br><br>scala&gt; df1.crossJoin(df2).show<br>+---+-----+---+------+<br>|<span class="hljs-string"> id</span>|<span class="hljs-string"> name</span>|<span class="hljs-string"> id</span>|<span class="hljs-string">  name</span>|<br>+---+-----+---+------+<br>|<span class="hljs-string">  1</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string">  1</span>|<span class="hljs-string"> Name1</span>|<br>|<span class="hljs-string">  2</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">  1</span>|<span class="hljs-string"> Name1</span>|<br>|<span class="hljs-string">  3</span>|<span class="hljs-string">Name3</span>|<span class="hljs-string">  1</span>|<span class="hljs-string"> Name1</span>|<br>|<span class="hljs-string">  1</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string">  2</span>|<span class="hljs-string"> Name2</span>|<br>|<span class="hljs-string">  2</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">  2</span>|<span class="hljs-string"> Name2</span>|<br>|<span class="hljs-string">  3</span>|<span class="hljs-string">Name3</span>|<span class="hljs-string">  2</span>|<span class="hljs-string"> Name2</span>|<br>|<span class="hljs-string">  1</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string">  2</span>|<span class="hljs-string">Name22</span>|<br>|<span class="hljs-string">  2</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">  2</span>|<span class="hljs-string">Name22</span>|<br>|<span class="hljs-string">  3</span>|<span class="hljs-string">Name3</span>|<span class="hljs-string">  2</span>|<span class="hljs-string">Name22</span>|<br>|<span class="hljs-string">  1</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string">  4</span>|<span class="hljs-string"> Name4</span>|<br>|<span class="hljs-string">  2</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">  4</span>|<span class="hljs-string"> Name4</span>|<br>|<span class="hljs-string">  3</span>|<span class="hljs-string">Name3</span>|<span class="hljs-string">  4</span>|<span class="hljs-string"> Name4</span>|<br>+---+-----+---+------+<br></code></pre></td></tr></table></figure>
+<h4 id="limit"><a href="#limit" class="headerlink" title="limit"></a>limit</h4><p>取当前 DataFrame 的前 n 条记录，返回一个新的 DataFrame  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df =  spark.createDataFrame((1 to 6).toList.map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br><span class="hljs-section">scala&gt; df.limit(3).show</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br></code></pre></td></tr></table></figure>
+<h4 id="offset"><a href="#offset" class="headerlink" title="offset"></a>offset</h4><p>跳过当前 DataFrame 的前 n 条记录，返回一个新的 DataFrame  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df =  spark.createDataFrame((1 to 6).toList.map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br><span class="hljs-section">scala&gt; df.offset(2).limit(3).show</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  3|Name3|<br>|  4|Name4|<br><span class="hljs-section">|  5|Name5|</span><br><span class="hljs-section">+---+-----+</span><br></code></pre></td></tr></table></figure>
+<h4 id="union"><a href="#union" class="headerlink" title="union"></a>union</h4><p>两个 DataFrame 求并集，按列的位置进行合并，不会对结果去重，返回一个新的 DataFrame  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df1 =  spark.createDataFrame((1 to 3).toList.map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; val df2 =  spark.createDataFrame((3 to 5).toList.map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br><span class="hljs-section">scala&gt; df1.union(df2).show()</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  3|Name3|<br>|  4|Name4|<br><span class="hljs-section">|  5|Name5|</span><br><span class="hljs-section">+---+-----+</span><br></code></pre></td></tr></table></figure>
+<h4 id="unionAll"><a href="#unionAll" class="headerlink" title="unionAll"></a>unionAll</h4><p>与 <a href="#union">union</a> 的行为一致，提供与 SQL 语义一致的同名算子</p>
+<h4 id="unionByName"><a href="#unionByName" class="headerlink" title="unionByName"></a>unionByName</h4><p>两个 DataFrame 求并集，按列的名称进行合并，不会对结果去重，返回一个新的 DataFrame  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df1 =  spark.createDataFrame((1 to 3).toList.map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; val df2 =  spark.createDataFrame((3 to 5).toList.map(x =&gt; Person(x, &quot;Name&quot; + x))).to<br><br><span class="hljs-section">scala&gt; df1.union(df2).show()</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  3|Name3|<br>|  4|Name4|<br><span class="hljs-section">|  5|Name5|</span><br><span class="hljs-section">+---+-----+</span><br></code></pre></td></tr></table></figure>
+<h4 id="intersect"><a href="#intersect" class="headerlink" title="intersect"></a>intersect</h4><p>返回两个 DataFrame 的交集，会对结果去重  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df1 =  spark.createDataFrame(List(1, 2, 3, 3, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; val df2 =  spark.createDataFrame(List(3, 3, 4, 5).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br><span class="hljs-section">scala&gt; df1.intersect(df2).show()</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br></code></pre></td></tr></table></figure>
+<h4 id="intersectAll"><a href="#intersectAll" class="headerlink" title="intersectAll"></a>intersectAll</h4><p>返回两个 DataFrame 的交集，不会对结果去重  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df1 =  spark.createDataFrame(List(1, 2, 3, 3, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; val df2 =  spark.createDataFrame(List(3, 3, 4, 5).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br><span class="hljs-section">scala&gt; df1.intersectAll(df2).show()</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  3|Name3|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br><br></code></pre></td></tr></table></figure>
+<h4 id="except"><a href="#except" class="headerlink" title="except"></a>except</h4><p>返回两个 DataFrame 的差集，不会对结果去重</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df1 =  spark.createDataFrame(List(1, 2, 2, 3, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; val df2 =  spark.createDataFrame(List(3, 4, 5).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br><span class="hljs-section">scala&gt; df1.except(df2).show()</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br><span class="hljs-section">|  2|Name2|</span><br><span class="hljs-section">+---+-----+</span><br><br></code></pre></td></tr></table></figure>
+<h4 id="exceptAll"><a href="#exceptAll" class="headerlink" title="exceptAll"></a>exceptAll</h4><figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df1 =  spark.createDataFrame(List(1, 2, 2, 3, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; val df2 =  spark.createDataFrame(List(3, 4, 5).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br><span class="hljs-section">scala&gt; df1.exceptAll(df2).show()</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br></code></pre></td></tr></table></figure>
+<h4 id="sample"><a href="#sample" class="headerlink" title="sample"></a>sample</h4><p>对 DataFrame 进行采样，返回包含样本记录的新 DataFrame, 参数 fraction 不代表精确的比例，仅代表每条记录被命中的概率  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame((1 to 100).toList.map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br><span class="hljs-section">scala&gt; df.sample(0.05).show()</span><br><span class="hljs-section">+---+------+</span><br><span class="hljs-section">| id|  name|</span><br><span class="hljs-section">+---+------+</span><br>|  1| Name1|<br>| 17|Name17|<br>| 21|Name21|<br><span class="hljs-section">| 90|Name90|</span><br><span class="hljs-section">+---+------+</span><br></code></pre></td></tr></table></figure>
+<h4 id="randomSplit"><a href="#randomSplit" class="headerlink" title="randomSplit"></a>randomSplit</h4><p>将 DataFrame 切分成一组 DataFrame 的 Array, 切分成多少组由权重 weights 的数组大小决定, 权重不代表精确的比例，仅代表每条记录被命中的概率  </p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">scala&gt; <span class="hljs-keyword">case</span> <span class="hljs-keyword">class</span> Person(id: <span class="hljs-type">Int</span>, <span class="hljs-type">name</span>: String)<br>scala&gt; val df = spark.createDataFrame((<span class="hljs-number">1</span> <span class="hljs-keyword">to</span> <span class="hljs-number">100</span>).toList.map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; val splitedDFs = df.randomSplit(<span class="hljs-keyword">Array</span>(<span class="hljs-number">0.2</span>, <span class="hljs-number">0.8</span>))<br>splitedDFs: <span class="hljs-keyword">Array</span>[org.apache.spark.<span class="hljs-keyword">sql</span>.Dataset[org.apache.spark.<span class="hljs-keyword">sql</span>.<span class="hljs-keyword">Row</span>]] = <span class="hljs-keyword">Array</span>([id: <span class="hljs-type">int</span>, <span class="hljs-type">name</span>: string], [id: <span class="hljs-type">int</span>, <span class="hljs-type">name</span>: string])<br><br>scala&gt; splitedDFs.map(_.count)<br>res0: <span class="hljs-keyword">Array</span>[Long] = <span class="hljs-keyword">Array</span>(<span class="hljs-number">16</span>, <span class="hljs-number">84</span>)<br></code></pre></td></tr></table></figure>
+<h4 id="randomSplitAsList"><a href="#randomSplitAsList" class="headerlink" title="randomSplitAsList"></a>randomSplitAsList</h4><p>将 DataFrame 切分成一组 DataFrame 的 java List, 切分成多少组由权重 weights 的数组大小决定, 并要求传入种子值 seed。权重不代表精确的比例，仅代表每条记录被命中的概率</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; case class <span class="hljs-built_in">Person</span>(id: Int, name: String)<br>scala&gt; val df = spark<span class="hljs-selector-class">.createDataFrame</span>((<span class="hljs-number">1</span> to <span class="hljs-number">100</span>)<span class="hljs-selector-class">.toList</span><span class="hljs-selector-class">.map</span>(<span class="hljs-attribute">x</span> =&gt; <span class="hljs-built_in">Person</span>(x, <span class="hljs-string">&quot;Name&quot;</span> + x)))<br><br>scala&gt; val splitedDFs = df<span class="hljs-selector-class">.randomSplitAsList</span>(weights=<span class="hljs-built_in">Array</span>(<span class="hljs-number">0.2</span>, <span class="hljs-number">0.8</span>), seed=scala<span class="hljs-selector-class">.util</span><span class="hljs-selector-class">.Random</span>.nextLong)<br>splitedDFs: java<span class="hljs-selector-class">.util</span><span class="hljs-selector-class">.List</span><span class="hljs-selector-attr">[org.apache.spark.sql.Dataset[org.apache.spark.sql.Row]</span>] = <span class="hljs-selector-attr">[[id: int, name: string]</span>, <span class="hljs-selector-attr">[id: int, name: string]</span>]<br><br>scala&gt; splitedDFs<span class="hljs-selector-class">.asScala</span><span class="hljs-selector-class">.map</span>(_.count)<br>res0: scala<span class="hljs-selector-class">.collection</span><span class="hljs-selector-class">.mutable</span><span class="hljs-selector-class">.Buffer</span><span class="hljs-selector-attr">[Long]</span> = <span class="hljs-built_in">ArrayBuffer</span>(<span class="hljs-number">14</span>, <span class="hljs-number">86</span>)<br></code></pre></td></tr></table></figure>
+
+<h3 id="聚合操作"><a href="#聚合操作" class="headerlink" title="聚合操作"></a>聚合操作</h3><h4 id="groupBy"><a href="#groupBy" class="headerlink" title="groupBy"></a>groupBy</h4><p>将 DataFrame 按指定的列进行分组，返回一个 RelationalGroupedDataset，以便进行后续的聚合操作  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(1, 1, 2, 2, 2).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; val groupedDF = df.groupBy(df(&quot;id&quot;))<br>groupedDF: org.apache.spark.sql.RelationalGroupedDataset = RelationalGroupedDataset: [grouping expressions: [id: int], value: [id: int, name: string], type: GroupBy]<br><br><span class="hljs-section">scala&gt; groupedDF.count.show</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id|count|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|    2|<br><span class="hljs-section">|  2|    3|</span><br><span class="hljs-section">+---+-----+</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="agg"><a href="#agg" class="headerlink" title="agg"></a>agg</h4><p>将 DataFrame 视为一个整体进行聚合操作  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(1, 1, 2, 2, 2).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br><span class="hljs-section">scala&gt; df.agg(max(&quot;id&quot;)).show</span><br><span class="hljs-section">+-------+</span><br><span class="hljs-section">|max(id)|</span><br><span class="hljs-section">+-------+</span><br><span class="hljs-section">|      2|</span><br><span class="hljs-section">+-------+</span><br><br><span class="hljs-section">scala&gt; df.agg(Map(&quot;id&quot; -&gt; &quot;count&quot;, &quot;name&quot; -&gt; &quot;max&quot;)).show</span><br><span class="hljs-section">+---------+---------+</span><br><span class="hljs-section">|count(id)|max(name)|</span><br><span class="hljs-section">+---------+---------+</span><br><span class="hljs-section">|        5|    Name2|</span><br><span class="hljs-section">+---------+---------+</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="rollup"><a href="#rollup" class="headerlink" title="rollup"></a>rollup</h4><p>将 DataFrame 按指定的列进行多维逐级聚合操作，类似与 <a href="#groupby">groupBy</a>，同样返回一个 RelationalGroupedDataset，以便进行后续的聚合操作。<br>但是会以指定的列逐级分组，即： 假设给定维度为 (colA, colB, colC)，则会分别按照如下组合对数据进行汇总：  </p>
+<ul>
+<li>colA, colB, colC</li>
+<li>colA, colB</li>
+<li>colA</li>
+<li>None</li>
+</ul>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">scala&gt; case class Person(id: Int, name: String, age: Int)<br>scala&gt; val df = spark.createDataFrame(List(1, 1, 2, 2, 2).map(x =&gt; Person(x, <span class="hljs-string">&quot;Name&quot;</span> + x, 50)))<br><br>scala&gt; df.rollup(<span class="hljs-string">&quot;id&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;age&quot;</span>).count().show<br>+----+-----+----+-----+<br>|<span class="hljs-string">  id</span>|<span class="hljs-string"> name</span>|<span class="hljs-string"> age</span>|<span class="hljs-string">count</span>|<br>+----+-----+----+-----+<br>|<span class="hljs-string">   1</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string">  50</span>|<span class="hljs-string">    2</span>|<br>|<span class="hljs-string">   2</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">  50</span>|<span class="hljs-string">    3</span>|<br>|<span class="hljs-string">   1</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string">NULL</span>|<span class="hljs-string">    2</span>|<br>|<span class="hljs-string">   2</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">NULL</span>|<span class="hljs-string">    3</span>|<br>|<span class="hljs-string">   1</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string">NULL</span>|<span class="hljs-string">    2</span>|<br>|<span class="hljs-string">   2</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string">NULL</span>|<span class="hljs-string">    3</span>|<br>|<span class="hljs-string">NULL</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string">NULL</span>|<span class="hljs-string">    5</span>|<br>+----+-----+----+-----+<br><br></code></pre></td></tr></table></figure>
+
+<h4 id="cube"><a href="#cube" class="headerlink" title="cube"></a>cube</h4><p>将 DataFrame 按指定的列创建一个多维立方体，类似与 <a href="#groupby">groupBy</a>，同样返回一个 RelationalGroupedDataset，以便进行后续的聚合操作。<br>但是会以指定的列按所有的维度组合进行分组，多维立方体(cube)即： 假设给定维度为 (colA, colB, colC)，则会分别按照如下组合对数据进行汇总：</p>
+<ul>
+<li>colA, colB, colC</li>
+<li>colA, colB</li>
+<li>colA, colC</li>
+<li>colB, colC</li>
+<li>colA</li>
+<li>colB</li>
+<li>colC</li>
+<li>None</li>
+</ul>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">scala&gt; case class Person(id: Int, name: String, age: Int)<br>scala&gt; val df = spark.createDataFrame(List(1, 1, 2, 2, 2).map(x =&gt; Person(x, <span class="hljs-string">&quot;Name&quot;</span> + x, 50)))<br><br>scala&gt; df.cube(<span class="hljs-string">&quot;id&quot;</span>, <span class="hljs-string">&quot;name&quot;</span>, <span class="hljs-string">&quot;age&quot;</span>).count().show<br>+----+-----+----+-----+<br>|<span class="hljs-string">  id</span>|<span class="hljs-string"> name</span>|<span class="hljs-string"> age</span>|<span class="hljs-string">count</span>|<br>+----+-----+----+-----+<br>|<span class="hljs-string">   1</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string">  50</span>|<span class="hljs-string">    2</span>|<br>|<span class="hljs-string">   2</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">  50</span>|<span class="hljs-string">    3</span>|<br>|<span class="hljs-string">   1</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string">NULL</span>|<span class="hljs-string">    2</span>|<br>|<span class="hljs-string">   2</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">NULL</span>|<span class="hljs-string">    3</span>|<br>|<span class="hljs-string">   1</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string">  50</span>|<span class="hljs-string">    2</span>|<br>|<span class="hljs-string">   2</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string">  50</span>|<span class="hljs-string">    3</span>|<br>|<span class="hljs-string">NULL</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string">  50</span>|<span class="hljs-string">    2</span>|<br>|<span class="hljs-string">NULL</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">  50</span>|<span class="hljs-string">    3</span>|<br>|<span class="hljs-string">   1</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string">NULL</span>|<span class="hljs-string">    2</span>|<br>|<span class="hljs-string">   2</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string">NULL</span>|<span class="hljs-string">    3</span>|<br>|<span class="hljs-string">NULL</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string">NULL</span>|<span class="hljs-string">    2</span>|<br>|<span class="hljs-string">NULL</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">NULL</span>|<span class="hljs-string">    3</span>|<br>|<span class="hljs-string">NULL</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string">  50</span>|<span class="hljs-string">    5</span>|<br>|<span class="hljs-string">NULL</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string">NULL</span>|<span class="hljs-string">    5</span>|<br>+----+-----+----+-----+<br><br></code></pre></td></tr></table></figure>
+<h4 id="groupingSets-Spark-4-0"><a href="#groupingSets-Spark-4-0" class="headerlink" title="groupingSets  Spark 4.0 +"></a>groupingSets  Spark 4.0 +</h4><p>todo 待补充</p>
+<h4 id="distinct"><a href="#distinct" class="headerlink" title="distinct"></a>distinct</h4><p>对 DataFrame 进行去重，完全重复的数据将仅保留一条</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(Person(1, &quot;Name1&quot;), Person(2, &quot;Name2&quot;), Person(2, &quot;Name2&quot;), Person(3, &quot;Name3&quot;), Person(3, &quot;Name333&quot;)))<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.distinct.show</span><br><span class="hljs-section">+---+-------+</span><br><span class="hljs-section">| id|   name|</span><br><span class="hljs-section">+---+-------+</span><br>|  1|  Name1|<br>|  2|  Name2|<br>|  3|  Name3|<br><span class="hljs-section">|  3|Name333|</span><br><span class="hljs-section">+---+-------+</span><br></code></pre></td></tr></table></figure>
+<h4 id="dropDuplicates"><a href="#dropDuplicates" class="headerlink" title="dropDuplicates"></a>dropDuplicates</h4><p>对 DataFrame 按指定的列进行去重，相同列的重复记录将仅保留第一条记录</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(Person(1, &quot;Name1&quot;), Person(2, &quot;Name2&quot;), Person(2, &quot;Name2&quot;), Person(3, &quot;Name3&quot;), Person(3, &quot;Name333&quot;)))<br>df: org.apache.spark.sql.DataFrame = [id: int, name: string]<br><br><span class="hljs-section">scala&gt; df.dropDuplicates(&quot;id&quot;).show</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="describe"><a href="#describe" class="headerlink" title="describe"></a>describe</h4><p>对 DataFrame 的数据进行描述，返回一些常用的统计指标  </p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">scala&gt; case class Person(id: Int, name: String, age: Int)<br>scala&gt; val df = spark.createDataFrame(List(1, 1, 2, 2, 2).map(x =&gt; Person(x, <span class="hljs-string">&quot;Name&quot;</span> + x, 50)))<br><br>scala&gt; df.describe().show<br>+-------+------------------+-----+----+<br>|<span class="hljs-string">summary</span>|<span class="hljs-string">                id</span>|<span class="hljs-string"> name</span>|<span class="hljs-string"> age</span>|<br>+-------+------------------+-----+----+<br>|<span class="hljs-string">  count</span>|<span class="hljs-string">                 5</span>|<span class="hljs-string">    5</span>|<span class="hljs-string">   5</span>|<br>|<span class="hljs-string">   mean</span>|<span class="hljs-string">               1.6</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string">50.0</span>|<br>|<span class="hljs-string"> stddev</span>|<span class="hljs-string">0.5477225575051661</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string"> 0.0</span>|<br>|<span class="hljs-string">    min</span>|<span class="hljs-string">                 1</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string">  50</span>|<br>|<span class="hljs-string">    max</span>|<span class="hljs-string">                 2</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">  50</span>|<br>+-------+------------------+-----+----+<br></code></pre></td></tr></table></figure>
+
+<h4 id="summary"><a href="#summary" class="headerlink" title="summary"></a>summary</h4><p>与 <a href="#describe">describe</a> 类似，在其基础上增加了 <code>p25</code>, <code>p50</code>, <code>p75</code> 等指标  </p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">scala&gt; case class Person(id: Int, name: String, age: Int)<br>scala&gt; val df = spark.createDataFrame(List(1, 1, 2, 2, 2).map(x =&gt; Person(x, <span class="hljs-string">&quot;Name&quot;</span> + x, 50)))<br><br>scala&gt; df.summary().show<br>+-------+------------------+-----+----+<br>|<span class="hljs-string">summary</span>|<span class="hljs-string">                id</span>|<span class="hljs-string"> name</span>|<span class="hljs-string"> age</span>|<br>+-------+------------------+-----+----+<br>|<span class="hljs-string">  count</span>|<span class="hljs-string">                 5</span>|<span class="hljs-string">    5</span>|<span class="hljs-string">   5</span>|<br>|<span class="hljs-string">   mean</span>|<span class="hljs-string">               1.6</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string">50.0</span>|<br>|<span class="hljs-string"> stddev</span>|<span class="hljs-string">0.5477225575051661</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string"> 0.0</span>|<br>|<span class="hljs-string">    min</span>|<span class="hljs-string">                 1</span>|<span class="hljs-string">Name1</span>|<span class="hljs-string">  50</span>|<br>|<span class="hljs-string">    25%</span>|<span class="hljs-string">                 1</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string">  50</span>|<br>|<span class="hljs-string">    50%</span>|<span class="hljs-string">                 2</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string">  50</span>|<br>|<span class="hljs-string">    75%</span>|<span class="hljs-string">                 2</span>|<span class="hljs-string"> NULL</span>|<span class="hljs-string">  50</span>|<br>|<span class="hljs-string">    max</span>|<span class="hljs-string">                 2</span>|<span class="hljs-string">Name2</span>|<span class="hljs-string">  50</span>|<br>+-------+------------------+-----+----+<br></code></pre></td></tr></table></figure>
+
+<h2 id="Action-算子"><a href="#Action-算子" class="headerlink" title="Action 算子"></a>Action 算子</h2><h3 id="转换为内存集合"><a href="#转换为内存集合" class="headerlink" title="转换为内存集合"></a>转换为内存集合</h3><h4 id="reduce"><a href="#reduce" class="headerlink" title="reduce"></a>reduce</h4><p>对 DataFrame 进行合并操作, 所有记录按照用户指定的 (left, right) &#x3D;&gt; result 函数从左到右进行合并, 返回一个 Java 集合<br>如下面的例子中，仅保留最大的 id 的第一条记录</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; case class <span class="hljs-built_in">Person</span>(id: Int, name: String)<br>scala&gt; val df = spark<span class="hljs-selector-class">.createDataFrame</span>(<span class="hljs-built_in">List</span>(<span class="hljs-built_in">Person</span>(<span class="hljs-number">1</span>, <span class="hljs-string">&quot;Name1&quot;</span>), <span class="hljs-built_in">Person</span>(<span class="hljs-number">2</span>, <span class="hljs-string">&quot;Name2&quot;</span>), <span class="hljs-built_in">Person</span>(<span class="hljs-number">2</span>, <span class="hljs-string">&quot;Name2&quot;</span>), <span class="hljs-built_in">Person</span>(<span class="hljs-number">3</span>, <span class="hljs-string">&quot;Name3&quot;</span>), <span class="hljs-built_in">Person</span>(<span class="hljs-number">3</span>, <span class="hljs-string">&quot;Name333&quot;</span>)))<br><br>scala&gt; df<span class="hljs-selector-class">.reduce</span>((row_left, row_right) =&gt; <span class="hljs-keyword">if</span> (row_right<span class="hljs-selector-class">.getAs</span><span class="hljs-selector-attr">[Int]</span>(<span class="hljs-string">&quot;id&quot;</span>) &gt; row_left<span class="hljs-selector-class">.getAs</span><span class="hljs-selector-attr">[Int]</span>(<span class="hljs-string">&quot;id&quot;</span>)) row_right <span class="hljs-keyword">else</span> row_left)<br>res0: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.sql</span><span class="hljs-selector-class">.Row</span> = <span class="hljs-selector-attr">[3,Name3]</span><br></code></pre></td></tr></table></figure>
+<h4 id="foreach"><a href="#foreach" class="headerlink" title="foreach"></a>foreach</h4><p>遍历 DataFrame 中的每一条记录，根据提供的 row &#x3D;&gt; Unit 函数，将记录写入外部系统，或打印到控制台，或添加到其他 Java 集合中等</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs nix">scala<span class="hljs-operator">&gt;</span> case class Person(<span class="hljs-params">id:</span> Int, <span class="hljs-params">name:</span> String)<br>scala<span class="hljs-operator">&gt;</span> val df <span class="hljs-operator">=</span> spark.createDataFrame(List(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>).<span class="hljs-built_in">map</span>(x <span class="hljs-operator">=</span><span class="hljs-operator">&gt;</span> Person(x, <span class="hljs-string">&quot;Name&quot;</span> <span class="hljs-operator">+</span> x)))<br><br>scala<span class="hljs-operator">&gt;</span> df.foreach(row <span class="hljs-operator">=</span><span class="hljs-operator">&gt;</span> println(s<span class="hljs-string">&quot;id: <span class="hljs-subst">$&#123;row.get(<span class="hljs-number">0</span>)&#125;</span>, name: <span class="hljs-subst">$&#123;row.get(<span class="hljs-number">1</span>)&#125;</span>&quot;</span>))<br><span class="hljs-params">id:</span> <span class="hljs-number">1</span>, <span class="hljs-params">name:</span> Name1<br><span class="hljs-params">id:</span> <span class="hljs-number">2</span>, <span class="hljs-params">name:</span> Name2<br></code></pre></td></tr></table></figure>
+<h4 id="foreachPartition"><a href="#foreachPartition" class="headerlink" title="foreachPartition"></a>foreachPartition</h4><p>遍历 DataFrame 中的每一个 partition，每个 partition 中的 row 被封装在一个 Iterator 中， 根据提供的 iterator[Row] &#x3D;&gt; Unit 函数，将记录写入外部系统，或打印到控制台，或添加到其他 Java 集合中等</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs nix">scala<span class="hljs-operator">&gt;</span> case class Person(<span class="hljs-params">id:</span> Int, <span class="hljs-params">name:</span> String)<br>scala<span class="hljs-operator">&gt;</span> val df <span class="hljs-operator">=</span> spark.createDataFrame(List(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>).<span class="hljs-built_in">map</span>(x <span class="hljs-operator">=</span><span class="hljs-operator">&gt;</span> Person(x, <span class="hljs-string">&quot;Name&quot;</span> <span class="hljs-operator">+</span> x))).repartition(<span class="hljs-number">2</span>)<br><br>scala<span class="hljs-operator">&gt;</span> df.foreachPartition&#123; (<span class="hljs-params">iter:</span> Iterator[org.apache.spark.sql.Row]) <span class="hljs-operator">=</span><span class="hljs-operator">&gt;</span> <br>  val partitionId <span class="hljs-operator">=</span> org.apache.spark.TaskContext.getPartitionId <br>  iter.foreach(row <span class="hljs-operator">=</span><span class="hljs-operator">&gt;</span> println(s<span class="hljs-string">&quot;partition: <span class="hljs-subst">$&#123;partitionId&#125;</span>, id: <span class="hljs-subst">$&#123;row.get(<span class="hljs-number">0</span>)&#125;</span>, name: <span class="hljs-subst">$&#123;row.get(<span class="hljs-number">1</span>)&#125;</span>&quot;</span>))<br>&#125;<br><span class="hljs-params">partition:</span> <span class="hljs-number">0</span>, <span class="hljs-params">id:</span> <span class="hljs-number">1</span>, <span class="hljs-params">name:</span> Name1<br><span class="hljs-params">partition:</span> <span class="hljs-number">1</span>, <span class="hljs-params">id:</span> <span class="hljs-number">2</span>, <span class="hljs-params">name:</span> Name2<br></code></pre></td></tr></table></figure>
+<h4 id="isEmpty"><a href="#isEmpty" class="headerlink" title="isEmpty"></a>isEmpty</h4><p>判断 DataFrame 是否为空, 返回 true 或 false  </p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs livescript">scala&gt; <span class="hljs-keyword">case</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Person</span>(id: Int, name: <span class="hljs-built_in">String</span>)<br>scala&gt; val df = spark.createDataFrame(List(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>).<span class="hljs-keyword">map</span>(x =&gt; Person(x, <span class="hljs-string">&quot;Name&quot;</span> + x)))<br><br>scala&gt; df.isEmpty<br>res0: <span class="hljs-built_in">Boolean</span> = <span class="hljs-literal">false</span><br></code></pre></td></tr></table></figure>
+<h4 id="head"><a href="#head" class="headerlink" title="head"></a>head</h4><p>返回 DataFrame 的前 n 条记录，默认为 n &#x3D; 1  </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; case class <span class="hljs-built_in">Person</span>(id: Int, name: String)<br>scala&gt; val df = spark<span class="hljs-selector-class">.createDataFrame</span>(<span class="hljs-built_in">List</span>(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>)<span class="hljs-selector-class">.map</span>(<span class="hljs-attribute">x</span> =&gt; <span class="hljs-built_in">Person</span>(x, <span class="hljs-string">&quot;Name&quot;</span> + x)))<br><br>scala&gt; df<span class="hljs-selector-class">.head</span><br>res0: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.sql</span><span class="hljs-selector-class">.Row</span> = <span class="hljs-selector-attr">[1,Name1]</span><br><br>scala&gt; df<span class="hljs-selector-class">.head</span>(<span class="hljs-number">2</span>)<br>res1: Array<span class="hljs-selector-attr">[org.apache.spark.sql.Row]</span> = <span class="hljs-built_in">Array</span>(<span class="hljs-selector-attr">[1,Name1]</span>, <span class="hljs-selector-attr">[2,Name2]</span>)<br></code></pre></td></tr></table></figure>
+<h4 id="first"><a href="#first" class="headerlink" title="first"></a>first</h4><p>与 <a href="#head">head(1)</a> 语义一致  </p>
+<h4 id="take"><a href="#take" class="headerlink" title="take"></a>take</h4><p>与 <a href="#head">head(n)</a> 语义一致</p>
+<h4 id="tail"><a href="#tail" class="headerlink" title="tail"></a>tail</h4><p>返回 DataFrame 的后 n 条记录</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; case class <span class="hljs-built_in">Person</span>(id: Int, name: String)<br>scala&gt; val df = spark<span class="hljs-selector-class">.createDataFrame</span>(<span class="hljs-built_in">List</span>(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>)<span class="hljs-selector-class">.map</span>(<span class="hljs-attribute">x</span> =&gt; <span class="hljs-built_in">Person</span>(x, <span class="hljs-string">&quot;Name&quot;</span> + x)))<br><br>scala&gt; df<span class="hljs-selector-class">.tail</span>(<span class="hljs-number">2</span>)<br>res0: Array<span class="hljs-selector-attr">[org.apache.spark.sql.Row]</span> = <span class="hljs-built_in">Array</span>(<span class="hljs-selector-attr">[2,Name2]</span>, <span class="hljs-selector-attr">[3,Name3]</span>)<br></code></pre></td></tr></table></figure>
+<h4 id="takeAsList"><a href="#takeAsList" class="headerlink" title="takeAsList"></a>takeAsList</h4><p>与 <a href="#take">take</a> 相似，只是返回返回一个 Java 的 List  </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; case class <span class="hljs-built_in">Person</span>(id: Int, name: String)<br>scala&gt; val df = spark<span class="hljs-selector-class">.createDataFrame</span>(<span class="hljs-built_in">List</span>(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>)<span class="hljs-selector-class">.map</span>(<span class="hljs-attribute">x</span> =&gt; <span class="hljs-built_in">Person</span>(x, <span class="hljs-string">&quot;Name&quot;</span> + x)))<br><br>scala&gt; df<span class="hljs-selector-class">.takeAsList</span>(<span class="hljs-number">2</span>)<br>res1: java<span class="hljs-selector-class">.util</span><span class="hljs-selector-class">.List</span><span class="hljs-selector-attr">[org.apache.spark.sql.Row]</span> = <span class="hljs-selector-attr">[[1,Name1]</span>, <span class="hljs-selector-attr">[2,Name2]</span>]<br></code></pre></td></tr></table></figure>
+<h4 id="collect"><a href="#collect" class="headerlink" title="collect"></a>collect</h4><p>将 DataFrame 的所有记录收集起来，返回一个 Java 的 Array 集合到 Driver 端，避免对大数据集使用此操作，以防止 Driver 端 OOM   </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; case class <span class="hljs-built_in">Person</span>(id: Int, name: String)<br>scala&gt; val df = spark<span class="hljs-selector-class">.createDataFrame</span>(<span class="hljs-built_in">List</span>(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>)<span class="hljs-selector-class">.map</span>(<span class="hljs-attribute">x</span> =&gt; <span class="hljs-built_in">Person</span>(x, <span class="hljs-string">&quot;Name&quot;</span> + x)))<br><br>scala&gt; df<span class="hljs-selector-class">.collect</span><br>res0: Array<span class="hljs-selector-attr">[org.apache.spark.sql.Row]</span> = <span class="hljs-built_in">Array</span>(<span class="hljs-selector-attr">[1,Name1]</span>, <span class="hljs-selector-attr">[2,Name2]</span>, <span class="hljs-selector-attr">[3,Name3]</span>)<br></code></pre></td></tr></table></figure>
+
+<h4 id="collectAsList"><a href="#collectAsList" class="headerlink" title="collectAsList"></a>collectAsList</h4><p>与 <a href="#collect">collect</a> 相似，只是返回一个 Java 的 List，避免对大数据集使用此操作，以防止 Driver 端 OOM  </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; case class <span class="hljs-built_in">Person</span>(id: Int, name: String)<br>scala&gt; val df = spark<span class="hljs-selector-class">.createDataFrame</span>(<span class="hljs-built_in">List</span>(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>)<span class="hljs-selector-class">.map</span>(<span class="hljs-attribute">x</span> =&gt; <span class="hljs-built_in">Person</span>(x, <span class="hljs-string">&quot;Name&quot;</span> + x)))<br><br>scala&gt; df<span class="hljs-selector-class">.collect</span><br>res0: java<span class="hljs-selector-class">.util</span><span class="hljs-selector-class">.List</span><span class="hljs-selector-attr">[org.apache.spark.sql.Row]</span> = <span class="hljs-selector-attr">[[1,Name1]</span>, <span class="hljs-selector-attr">[2,Name2]</span>, <span class="hljs-selector-attr">[3,Name3]</span>]<br></code></pre></td></tr></table></figure>
+
+<h4 id="toLocalIterator"><a href="#toLocalIterator" class="headerlink" title="toLocalIterator"></a>toLocalIterator</h4><p>将 DataFrame 的所有记录封装成 Java 的迭代器， Driver 端消耗的内存将与最大的 partition 消耗的内存一致  </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; case class <span class="hljs-built_in">Person</span>(id: Int, name: String)<br>scala&gt; val df = spark<span class="hljs-selector-class">.createDataFrame</span>(<span class="hljs-built_in">List</span>(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>)<span class="hljs-selector-class">.map</span>(<span class="hljs-attribute">x</span> =&gt; <span class="hljs-built_in">Person</span>(x, <span class="hljs-string">&quot;Name&quot;</span> + x)))<br><br>scala&gt; val rowIterator = df<span class="hljs-selector-class">.toLocalIterator</span><br>rowIterator: java<span class="hljs-selector-class">.util</span><span class="hljs-selector-class">.Iterator</span><span class="hljs-selector-attr">[org.apache.spark.sql.Row]</span> = <span class="hljs-built_in">IteratorWrapper</span>(&lt;iterator&gt;)<br><br>scala&gt; rowIterator<span class="hljs-selector-class">.next</span><br>res0: org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.spark</span><span class="hljs-selector-class">.sql</span><span class="hljs-selector-class">.Row</span> = <span class="hljs-selector-attr">[1,Name1]</span><br></code></pre></td></tr></table></figure>
+<h4 id="count"><a href="#count" class="headerlink" title="count"></a>count</h4><p>返回 DataFrame 的总记录数 </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scala&gt; case class <span class="hljs-built_in">Person</span>(id: Int, name: String)<br>scala&gt; val df = spark<span class="hljs-selector-class">.createDataFrame</span>(<span class="hljs-built_in">List</span>(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>)<span class="hljs-selector-class">.map</span>(<span class="hljs-attribute">x</span> =&gt; <span class="hljs-built_in">Person</span>(x, <span class="hljs-string">&quot;Name&quot;</span> + x)))<br><br>scala&gt; df<span class="hljs-selector-class">.count</span><br>res0: Long = <span class="hljs-number">3</span><br></code></pre></td></tr></table></figure>
+<h3 id="createOrReplaceGlobalTempView"><a href="#createOrReplaceGlobalTempView" class="headerlink" title="createOrReplaceGlobalTempView"></a>createOrReplaceGlobalTempView</h3><p>与 <a href="#createGlobalTempView">createGlobalTempView</a> 类似，只是视图存在时将覆盖原有视图</p>
+<h3 id="写入外部算子"><a href="#写入外部算子" class="headerlink" title="写入外部算子"></a>写入外部算子</h3><h4 id="write-v1"><a href="#write-v1" class="headerlink" title="write v1"></a>write v1</h4><p>DataFrame.write 方法将返回一个 DataFrameWriter 实例，包含以下方法</p>
+<h5 id="insertInto"><a href="#insertInto" class="headerlink" title="insertInto"></a>insertInto</h5><p>将 DataFrame 按写入指定的表中，写入操作是基于列的顺序的，因此要求目标表结构必须与 DataFrame 的 Schema 一致<br>不会自动创建表，可根据 <a href="#mode-">mode</a> 参数来选择写入模式，默认为追加记录  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(1, 2, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; spark.sql(&quot;create table test_table__insert_into(id int, name string)&quot;)<br>res0: org.apache.spark.sql.DataFrame = []<br><br>scala&gt; df.write.mode(&quot;append&quot;).insertInto(&quot;test<span class="hljs-emphasis">_table__insert_into&quot;)</span><br><span class="hljs-emphasis">scala&gt; df.write.mode(&quot;append&quot;).insertInto(&quot;test_table__insert_</span>into&quot;)<br><br><span class="hljs-section">scala&gt; spark.table(&quot;test_table__insert_into&quot;).show()</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  1|Name1|<br>|  2|Name2|<br>|  2|Name2|<br>|  3|Name3|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br><br>scala&gt; df.write.mode(&quot;overwrite&quot;).insertInto(&quot;test_table__insert_into&quot;)<br><br><span class="hljs-section">scala&gt; spark.table(&quot;test_table__insert_into&quot;).show()</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br><br>scala&gt; df.select(&quot;name&quot;, &quot;id&quot;).write.insertInto(&quot;test<span class="hljs-emphasis">_table__insert_into&quot;)</span><br><span class="hljs-emphasis">org.apache.spark.sql.AnalysisException: [INCOMPATIBLE_DATA_FOR_TABLE.CANNOT_SAFELY_CAST] Cannot write incompatible data for the table `spark_catalog`.`default`.`test_</span>person<span class="hljs-code">`: Cannot safely cast `</span>id` &quot;STRING&quot; to &quot;INT&quot;.<br><span class="hljs-code">  at org.apache.spark.sql.errors.QueryCompilationErrors$.incompatibleDataToTableCannotSafelyCastError(QueryCompilationErrors.scala:2216)</span><br></code></pre></td></tr></table></figure>
+<h5 id="saveAsTable"><a href="#saveAsTable" class="headerlink" title="saveAsTable"></a>saveAsTable</h5><p>将 DataFrame 按写入指定的表中，写入操作是基于列名的，因此不会对 DataFrame 的列顺序有严格要求，只要列存在即可<br>表不存在时将自动创建，可根据 <a href="#mode-">mode</a> 参数来选择写入模式，默认为表存在时报错  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(1, 2, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; df.write.mode(&quot;overwrite&quot;).saveAsTable(&quot;test_person_save_as_table&quot;)<br><br><span class="hljs-section">scala&gt; spark.table(&quot;test_person_save_as_table&quot;).show()</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br><br><span class="hljs-section">scala&gt; df.select(&quot;name&quot;, &quot;id&quot;).write.mode(&quot;append&quot;).saveAsTable(&quot;test_person_save_as_table&quot;)</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  1|Name1|<br>|  2|Name2|<br>|  2|Name2|<br>|  3|Name3|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br></code></pre></td></tr></table></figure>
+<h5 id="jdbc"><a href="#jdbc" class="headerlink" title="jdbc"></a>jdbc</h5><p>将 DataFrame 按 jdbc 协议写入外部数据库，如 MySQL&#x2F;Postgres 等, 等效于 <a href="#format">format</a> 为 <code>jdbc</code> 时的 <a href="#save">save</a> 操作<br>表不存在时将自动创建，可根据 <a href="#mode-">mode</a> 参数来选择写入模式，默认为表存在时报错<br>本例子中需要使用 MySQL 驱动来连接本地的 MySQL 数据库，因此需要将相应的驱动包加入 classpath，比如：  </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">spark-shell --packages &quot;mysql:mysql-connector-java:8.0.28&quot; <br></code></pre></td></tr></table></figure>
+
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(1, 2, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; val connectionProperties = new java.util.Properties()<br>scala&gt; connectionProperties.put(&quot;user&quot;, &quot;root&quot;)<br>scala&gt; connectionProperties.put(&quot;password&quot;, &quot;123456&quot;)<br>scala&gt; connectionProperties.put(&quot;driver&quot;, &quot;com.mysql.jdbc.Driver&quot;)<br><br>scala&gt; df.write.jdbc(<br><span class="hljs-code">  url=&quot;jdbc:mysql://localhost:3306/test?createDatabaseIfNotExist=true&quot;, </span><br><span class="hljs-code">  table=&quot;test_table__jdbc&quot;,</span><br><span class="hljs-code">  connectionProperties=connectionProperties</span><br>)<br><br>scala&gt; spark.read.jdbc(<br><span class="hljs-code">  url=&quot;jdbc:mysql://localhost:3306/test?createDatabaseIfNotExist=true&quot;, </span><br><span class="hljs-code">  table=&quot;test_table__jdbc&quot;,</span><br><span class="hljs-code">  properties=connectionProperties</span><br><span class="hljs-section">).show</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  2|Name2|<br>|  1|Name1|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br></code></pre></td></tr></table></figure>
+<h5 id="save"><a href="#save" class="headerlink" title="save"></a>save</h5><p>将 DataFrame 保存到外部存储系统中, 是 <a href="#jdbc">jdbc</a> 以及各个写文件操作（如 <a href="#json">json</a>, <a href="#csv">csv</a> 等）的统一抽象 </p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">scala&gt; <span class="hljs-keyword">case</span> <span class="hljs-keyword">class</span> Person(id: <span class="hljs-type">Int</span>, <span class="hljs-type">name</span>: String)<br>scala&gt; val df = spark.createDataFrame(List(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; &#123; <br>df.<span class="hljs-keyword">write</span>.format(&quot;jdbc&quot;)<br>  .<span class="hljs-keyword">option</span>(&quot;url&quot;, &quot;jdbc:mysql://localhost:3306/test?createDatabaseIfNotExist=true&quot;)<br>  .<span class="hljs-keyword">option</span>(&quot;driver&quot;, &quot;com.mysql.jdbc.Driver&quot;)<br>  .<span class="hljs-keyword">option</span>(&quot;user&quot;, &quot;root&quot;)<br>  .<span class="hljs-keyword">option</span>(&quot;password&quot;, &quot;123456&quot;)<br>  .<span class="hljs-keyword">option</span>(&quot;dbtable&quot;, &quot;test_table__jdbc_save&quot;)<br>  .save<br>&#125;<br><br>scala&gt; &#123; <br>spark.<span class="hljs-keyword">read</span>.format(&quot;jdbc&quot;)<br>  .<span class="hljs-keyword">option</span>(&quot;url&quot;, &quot;jdbc:mysql://localhost:3306/test?createDatabaseIfNotExist=true&quot;)<br>  .<span class="hljs-keyword">option</span>(&quot;driver&quot;, &quot;com.mysql.jdbc.Driver&quot;)<br>  .<span class="hljs-keyword">option</span>(&quot;user&quot;, &quot;root&quot;)<br>  .<span class="hljs-keyword">option</span>(&quot;password&quot;, &quot;123456&quot;)<br>  .<span class="hljs-keyword">option</span>(&quot;dbtable&quot;, &quot;test_table__jdbc_save&quot;)<br>  .<span class="hljs-keyword">load</span><br>&#125;.<span class="hljs-keyword">show</span><br>+<span class="hljs-comment">---+-----+</span><br>| id| <span class="hljs-type">name</span>|<br>+<span class="hljs-comment">---+-----+</span><br>|  <span class="hljs-number">2</span>|Name2|<br>|  <span class="hljs-number">3</span>|Name3|<br>|  <span class="hljs-number">1</span>|Name1|<br>+<span class="hljs-comment">---+-----+</span><br><br>scala&gt; df.<span class="hljs-keyword">write</span>.mode(&quot;overwrite&quot;).format(&quot;csv&quot;).<span class="hljs-keyword">option</span>(&quot;header&quot;, &quot;true&quot;).save(&quot;hdfs:///test_write/test_csv&quot;)<br><br>scala&gt; spark.<span class="hljs-keyword">read</span>.format(&quot;csv&quot;).<span class="hljs-keyword">option</span>(&quot;header&quot;, &quot;true&quot;).<span class="hljs-keyword">load</span>(&quot;hdfs:///test_write/test_csv&quot;).<span class="hljs-keyword">show</span><br>+<span class="hljs-comment">---+-----+</span><br>| id| <span class="hljs-type">name</span>|<br>+<span class="hljs-comment">---+-----+</span><br>|  <span class="hljs-number">1</span>|Name1|<br>|  <span class="hljs-number">2</span>|Name2|<br>|  <span class="hljs-number">3</span>|Name3|<br>+<span class="hljs-comment">---+-----+</span><br></code></pre></td></tr></table></figure>
+<h5 id="json"><a href="#json" class="headerlink" title="json"></a>json</h5><p>等同于 <a href="#format">format</a> 为 <code>json</code> 时的 <a href="#save">save</a> 操作  </p>
+<h5 id="parquet"><a href="#parquet" class="headerlink" title="parquet"></a>parquet</h5><p>等同于 <a href="#format">format</a> 为 <code>parquet</code> 时的 <a href="#save">save</a> 操作</p>
+<h5 id="orc"><a href="#orc" class="headerlink" title="orc"></a>orc</h5><p>等同于 <a href="#format">format</a> 为 <code>orc</code> 时的 <a href="#save">save</a> 操作</p>
+<h5 id="text"><a href="#text" class="headerlink" title="text"></a>text</h5><p>等同于 <a href="#format">format</a> 为 <code>text</code> 时的 <a href="#save">save</a> 操作</p>
+<h5 id="csv"><a href="#csv" class="headerlink" title="csv"></a>csv</h5><p>等同于 <a href="#format">format</a> 为 <code>csv</code> 时的 <a href="#save">save</a> 操作</p>
+<h5 id="xml"><a href="#xml" class="headerlink" title="xml"></a>xml</h5><p>等同于 <a href="#format">format</a> 为 <code>xml</code> 时的 <a href="#save">save</a> 操作</p>
+<h5 id="mode"><a href="#mode" class="headerlink" title="mode"></a>mode</h5><p>指定写入目标资源（表或文件目录等）时的写入模式  </p>
+<ul>
+<li>Overwrite: 将目标资源的原有记录覆盖，saveMode 为 <code>overwrite</code> 即表示 Overwrite 语义</li>
+<li>Append: 向目标资源中追加记录，saveMode 为 <code>append</code> 即表示 Append 语义</li>
+<li>Ignore: 当目标资源已存在时，将不做任何操作，saveMode 为 <code>ingore</code> 即表示 Ignore 语义</li>
+<li>ErrorIfExists: 当目标资源已存在时，将抛出异常，saveMode 为 <code>error</code>, <code>errorifexists</code>, <code>default</code> 均表示 ErrorIfExists 语义</li>
+</ul>
+<h4 id="writeTo-v2"><a href="#writeTo-v2" class="headerlink" title="writeTo v2"></a>writeTo v2</h4><p>DataFrame.writeTo(tableName) 方法将返回一个 DataFrameWriterV2 实例，用于操作 V2 的表（如 DataLake：Iceberg 等）<br>本例子中将采用 Spark Tests 中常用的 InMemoryTable，需先下载 <a target="_blank" rel="noopener" href="https://repo1.maven.org/maven2/org/apache/spark/spark-catalyst_2.12/3.5.1/spark-catalyst_2.12-3.5.1-tests.jar">spark-catalyst_2.12-3.5.1-tests.jar</a>  </p>
+<p>启动 spark-shell  </p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">spark</span>-shell --jars spark-catalyst_2.<span class="hljs-number">12</span>-<span class="hljs-number">3</span>.<span class="hljs-number">5</span>.<span class="hljs-number">1</span>-tests.jar<br></code></pre></td></tr></table></figure>
+<p>启动后注册 InMemoryTableCatalog 后，即可正常操作 InMemoryTable  </p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">spark.conf().<span class="hljs-built_in">set</span>(<span class="hljs-string">&quot;spark.sql.catalog.in_mem_catalog&quot;</span>, <span class="hljs-string">&quot;org.apache.spark.sql.connector.catalog.InMemoryTableCatalog&quot;</span>)<br></code></pre></td></tr></table></figure>
+<h5 id="create"><a href="#create" class="headerlink" title="create"></a>create</h5><p>将当前 DataFrame 创建为指定名称的表，表存在时将报错 </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(1, 2, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; df.writeTo(&quot;in_mem_catalog.test_write_to__create&quot;).create()<br><br><span class="hljs-section">scala&gt; spark.table(&quot;in_mem_catalog.test_write_to__create&quot;).show </span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br><br>scala&gt;  df.writeTo(&quot;in<span class="hljs-emphasis">_mem_catalog.test_write_to__create&quot;).create()</span><br><span class="hljs-emphasis">org.apache.spark.sql.catalyst.analysis.TableAlreadyExistsException: [TABLE_OR_VIEW_ALREADY_EXISTS] Cannot create table or view `test_write_to__</span>create` because it already exists.<br></code></pre></td></tr></table></figure>
+<h5 id="replace"><a href="#replace" class="headerlink" title="replace"></a>replace</h5><p>用当前 DataFrame 将指定名称的替换，表不存在时将报错  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(1, 2, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; df.writeTo(&quot;in<span class="hljs-emphasis">_mem_catalog.test_write_to__replace&quot;).replace()</span><br><span class="hljs-emphasis">org.apache.spark.sql.catalyst.analysis.CannotReplaceMissingTableException: [TABLE_OR_VIEW_NOT_FOUND] The table or view `test_write_to__</span>replace` cannot be found.<br><br>scala&gt; df.writeTo(&quot;in<span class="hljs-emphasis">_mem_catalog.test_write_to__replace&quot;).create()</span><br><span class="hljs-emphasis">scala&gt; spark.table(&quot;in_mem_catalog.test_write_to__</span>replace&quot;).show <br><span class="hljs-code">+---+</span>-----+<br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br><br>scala&gt; df.select(&quot;name&quot;, &quot;id&quot;).writeTo(&quot;in<span class="hljs-emphasis">_mem_catalog.test_write_to__replace&quot;).replace()</span><br><span class="hljs-emphasis">scala&gt; spark.table(&quot;in_mem_catalog.test_write_to__</span>replace&quot;).show<br><span class="hljs-code">+-----+</span>---+<br><span class="hljs-section">| name| id|</span><br><span class="hljs-section">+-----+---+</span><br>|Name1|  1|<br>|Name2|  2|<br><span class="hljs-section">|Name3|  3|</span><br><span class="hljs-section">+-----+---+</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="createOrReplace"><a href="#createOrReplace" class="headerlink" title="createOrReplace"></a>createOrReplace</h5><p><a href="#create">create</a> 和 <a href="#replace">replace</a> 的幂等操作，表不存在时创建，表存在时则替换   </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(1, 2, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; df.writeTo(&quot;in_mem_catalog.test_write_to__create_or_replace&quot;).createOrReplace()<br><br><span class="hljs-section">scala&gt; spark.table(&quot;in_mem_catalog.test_write_to__create_or_replace&quot;).show </span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br><br>scala&gt; df.select(&quot;name&quot;, &quot;id&quot;).writeTo(&quot;in<span class="hljs-emphasis">_mem_catalog.test_write_to__create_or_replace&quot;).createOrReplace()</span><br><span class="hljs-emphasis">scala&gt; spark.table(&quot;in_mem_catalog.test_write_to__create_or_</span>replace&quot;).show<br><span class="hljs-code">+-----+</span>---+<br><span class="hljs-section">| name| id|</span><br><span class="hljs-section">+-----+---+</span><br>|Name1|  1|<br>|Name2|  2|<br><span class="hljs-section">|Name3|  3|</span><br><span class="hljs-section">+-----+---+</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="append"><a href="#append" class="headerlink" title="append"></a>append</h5><p>将 DataFrame 中的记录追加写入到目标表中，写入操作是基于列名的，因此不会对 DataFrame 的列顺序有严格要求，只要列存在即可  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(1, 2, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; df.writeTo(&quot;in_mem_catalog.test_write_to__append&quot;).createOrReplace()<br><br><span class="hljs-section">scala&gt; spark.table(&quot;in_mem_catalog.test_write_to__append&quot;).show </span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br><br>scala&gt; df.select(&quot;name&quot;, &quot;id&quot;).writeTo(&quot;in<span class="hljs-emphasis">_mem_catalog.test_write_to__append&quot;).append()</span><br><span class="hljs-emphasis">scala&gt; spark.table(&quot;in_mem_catalog.test_write_to__</span>append&quot;).show<br><span class="hljs-code">+---+</span>-----+<br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br>|  3|Name3|<br>|  1|Name1|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br><br></code></pre></td></tr></table></figure>
+<h5 id="overwrite"><a href="#overwrite" class="headerlink" title="overwrite"></a>overwrite</h5><p>用当前 DataFrame 中的记录将目标表按条件覆盖，匹配的行将被覆盖，其余行将会追加到目标表中<br>写入操作是基于列名的，因此不会对 DataFrame 的列顺序有严格要求，只要列存在即可  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(1, 2, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; spark.sql(&quot;CREATE TABLE in<span class="hljs-emphasis">_mem_catalog.test_write_to__overwrite (id int, name string) USING foo PARTITIONED BY (id)&quot;)</span><br><span class="hljs-emphasis">scala&gt; df.writeTo(&quot;in_mem_catalog.test_write_to__</span>overwrite&quot;).append<br><br><span class="hljs-section">scala&gt; spark.table(&quot;in_mem_catalog.test_write_to__overwrite&quot;).show</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br><br>scala&gt; val df2 = spark.createDataFrame(List(Person(3, &quot;Name333&quot;), Person(4, &quot;Name444&quot;)))<br>scala&gt; df2.writeTo(&quot;in_mem_catalog.test_write_to__overwrite&quot;).overwrite($&quot;id&quot; === 3)<br><br><span class="hljs-section">scala&gt; spark.table(&quot;in_mem_catalog.test_write_to__overwrite&quot;).show</span><br><span class="hljs-section">+---+-------+</span><br><span class="hljs-section">| id|   name|</span><br><span class="hljs-section">+---+-------+</span><br>|  4|Name444|<br>|  1|  Name1|<br>|  3|Name333|<br><span class="hljs-section">|  2|  Name2|</span><br><span class="hljs-section">+---+-------+</span><br><br>scala&gt; df2.writeTo(&quot;in_mem_catalog.test_write_to__overwrite&quot;).overwrite(org.apache.spark.sql.functions.lit(true))<br><br><span class="hljs-section">scala&gt; spark.table(&quot;in_mem_catalog.test_write_to__overwrite&quot;).show</span><br><span class="hljs-section">+---+-------+</span><br><span class="hljs-section">| id|   name|</span><br><span class="hljs-section">+---+-------+</span><br>|  4|Name444|<br><span class="hljs-section">|  3|Name333|</span><br><span class="hljs-section">+---+-------+</span><br></code></pre></td></tr></table></figure>
+<h5 id="overwritePartitions"><a href="#overwritePartitions" class="headerlink" title="overwritePartitions"></a>overwritePartitions</h5><p>用当前 DataFrame 对目标表进行分区覆盖操作，匹配的分区将被覆盖  </p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(1, 1, 1, 2, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; spark.sql(&quot;CREATE TABLE in<span class="hljs-emphasis">_mem_catalog.test_write_to__overwrite_partitions (id int, name string) USING foo PARTITIONED BY (id)&quot;)</span><br><span class="hljs-emphasis">scala&gt; df.writeTo(&quot;in_mem_catalog.test_write_to__overwrite_</span>partitions&quot;).append<br><br><span class="hljs-section">scala&gt; spark.table(&quot;in_mem_catalog.test_write_to__overwrite_partitions&quot;).show</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br><br>scala&gt; val df2 = spark.createDataFrame(List(Person(1, &quot;Name111&quot;), Person(4, &quot;Name444&quot;)))<br>scala&gt; df2.writeTo(&quot;in_mem_catalog.test_write_to__overwrite_partitions&quot;).overwritePartitions<br><br><span class="hljs-section">scala&gt; spark.table(&quot;in_mem_catalog.test_write_to__overwrite_partitions&quot;).show</span><br><span class="hljs-section">+---+-------+</span><br><span class="hljs-section">| id|   name|</span><br><span class="hljs-section">+---+-------+</span><br>|  4|Name444|<br>|  1|Name111|<br>|  3|  Name3|<br><span class="hljs-section">|  2|  Name2|</span><br><span class="hljs-section">+---+-------+</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="mergeInto-spark-4-0"><a href="#mergeInto-spark-4-0" class="headerlink" title="mergeInto spark 4.0 +"></a>mergeInto spark 4.0 +</h4><p>DataFrame.mergeInto 方法将按照指定的条件与指定的目标进行关联，将返回一个 MergeIntoWriter 实例，包含以下方法<br>todo 为本章节添加 Example  </p>
+<h5 id="whenMatched"><a href="#whenMatched" class="headerlink" title="whenMatched"></a>whenMatched</h5><p>返回一个 WhenMatched 实例，可对目标表中与源 DataFrame 匹配的数据设置下列操作  </p>
+<h6 id="updateAll"><a href="#updateAll" class="headerlink" title="updateAll"></a>updateAll</h6><h6 id="update"><a href="#update" class="headerlink" title="update"></a>update</h6><h6 id="delete"><a href="#delete" class="headerlink" title="delete"></a>delete</h6><h5 id="whenNotMatched"><a href="#whenNotMatched" class="headerlink" title="whenNotMatched"></a>whenNotMatched</h5><p>返回一个 whenNotMatched 实例，可对源 DataFrame 中与目标表不匹配的数据设置下列操作  </p>
+<h6 id="insertAll"><a href="#insertAll" class="headerlink" title="insertAll"></a>insertAll</h6><h6 id="insert"><a href="#insert" class="headerlink" title="insert"></a>insert</h6><h5 id="whenNotMatchedBySource"><a href="#whenNotMatchedBySource" class="headerlink" title="whenNotMatchedBySource"></a>whenNotMatchedBySource</h5><p>返回一个 WhenNotMatchedBySource 实例，可对目标表中与源 DataFrame 不匹配的数据设置下列操作  </p>
+<h6 id="updateAll-1"><a href="#updateAll-1" class="headerlink" title="updateAll"></a>updateAll</h6><h6 id="update-1"><a href="#update-1" class="headerlink" title="update"></a>update</h6><h6 id="delete-1"><a href="#delete-1" class="headerlink" title="delete"></a>delete</h6><h5 id="withSchemaEvolution"><a href="#withSchemaEvolution" class="headerlink" title="withSchemaEvolution"></a>withSchemaEvolution</h5><p>启用自动 Schema 演进  </p>
+<h5 id="merge"><a href="#merge" class="headerlink" title="merge"></a>merge</h5><p>真正的 action 算子，根据上面的设置，执行最终的 merge 操作  </p>
+<h2 id="控制算子"><a href="#控制算子" class="headerlink" title="控制算子"></a>控制算子</h2><p>DataFrame 提供与 RDD 行为一致的控制算子如:</p>
+<ul>
+<li><a href="spark-rdd.md#persist">persist</a>  </li>
+<li><a href="spark-rdd.md#cache">cache</a>  </li>
+<li><a href="spark-rdd.md#unpersist">unpersist</a>  </li>
+<li><a href="spark-rdd.md#checkpoint">checkpoint</a></li>
+</ul>
+<p>除了这些以外，还提供了一些创建 View 的控制类算子  </p>
+<h3 id="createTempView"><a href="#createTempView" class="headerlink" title="createTempView"></a>createTempView</h3><p>为当前 DataFrame 创建临时视图，可用 SQL 语句对其进行访问，在当前 SparkSession 内有效，视图存在时将报错</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(1, 2, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; df.createTempView(&quot;temp_view_person&quot;)<br><br><span class="hljs-section">scala&gt; spark.sql(&quot;SELECT * FROM temp_view_person&quot;).show</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br>scala&gt; spark<br>res4: org.apache.spark.sql.SparkSession = org.apache.spark.sql.SparkSession@5f59d707<br><br>scala&gt; val newSpark = spark.newSession<br>newSpark: org.apache.spark.sql.SparkSession = org.apache.spark.sql.SparkSession@1916f999<br><br>scala&gt; newSpark.sql(&quot;SELECT * FROM temp<span class="hljs-emphasis">_view_person&quot;).show</span><br><span class="hljs-emphasis">org.apache.spark.sql.catalyst.ExtendedAnalysisException: [TABLE_OR_VIEW_NOT_FOUND] The table or view `temp_view_</span>person` cannot be found.<br></code></pre></td></tr></table></figure>
+<h3 id="createOrReplaceTempView"><a href="#createOrReplaceTempView" class="headerlink" title="createOrReplaceTempView"></a>createOrReplaceTempView</h3><p>与 <a href="#createTempView-">createTempView</a> 类似，只是视图存在时将覆盖原有视图</p>
+<h3 id="createGlobalTempView"><a href="#createGlobalTempView" class="headerlink" title="createGlobalTempView"></a>createGlobalTempView</h3><p>为当前 DataFrame 创建临时视图，可用 SQL 语句对其进行访问，在当前 Spark Application 内有效，视图存在时将报错</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">scala&gt; case class Person(id: Int, name: String)<br>scala&gt; val df = spark.createDataFrame(List(1, 2, 3).map(x =&gt; Person(x, &quot;Name&quot; + x)))<br><br>scala&gt; df.createGlobalTempView(&quot;temp_view_person&quot;)<br><br><span class="hljs-section">scala&gt; spark.sql(&quot;SELECT * FROM global_temp.temp_view_person&quot;).show</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br><br>scala&gt; spark<br>res4: org.apache.spark.sql.SparkSession = org.apache.spark.sql.SparkSession@5f59d707<br><br>scala&gt; val newSpark = spark.newSession<br>newSpark: org.apache.spark.sql.SparkSession = org.apache.spark.sql.SparkSession@1916f999<br><br><span class="hljs-section">scala&gt; newSpark.sql(&quot;SELECT * FROM global_temp.temp_view_person&quot;).show</span><br><span class="hljs-section">+---+-----+</span><br><span class="hljs-section">| id| name|</span><br><span class="hljs-section">+---+-----+</span><br>|  1|Name1|<br>|  2|Name2|<br><span class="hljs-section">|  3|Name3|</span><br><span class="hljs-section">+---+-----+</span><br></code></pre></td></tr></table></figure>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Spark/" class="category-chain-item">Spark</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Spark/" class="print-no-link">#Spark</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Spark Dataframe</div>
+      <div>http://example.com/2025/01/01/apache-spark/spark-dataframe/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>唐长老</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年1月1日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/01/01/Manual-Install-Sqoop/" title="Sqoop 安装">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Sqoop 安装</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/01/01/apache-spark/spark-rdd-action/" title="Spark RDD - Action 算子">
+                        <span class="hidden-mobile">Spark RDD - Action 算子</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"C9jETuLwvCO4tHwlcXW2ueCa-gzGzoHsz","appKey":"ujYxRlBDWb8IcQmRmFaoOqAi","path":"window.location.pathname","placeholder":"写留言","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

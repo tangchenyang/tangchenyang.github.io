@@ -1,0 +1,896 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="唐长老">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="数据工程与产品我们想象一下，有一家企业，经历了三年的从0到1野蛮生长期，取得了很大的成就，扩展了很多的客户，沉淀了很多的数据；同时也慢慢进入了发展缓慢期，公司规模越来越大，扩展新的业务越来越难，利润率也开始下降。偶然听到外界嘈杂的声音中传来的一些关键字：大数据时代，数字化转型，便将视线转向了沉淀了许久的数据，想从这一堆堆数据中挖点什么有价值的东西出来。   数据工程什么是数据工程我们先看看什么是软">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据工程与产品">
+<meta property="og:url" content="http://example.com/2025/01/01/Data-Project-And-Product/index.html">
+<meta property="og:site_name" content="唐长老的个人博客">
+<meta property="og:description" content="数据工程与产品我们想象一下，有一家企业，经历了三年的从0到1野蛮生长期，取得了很大的成就，扩展了很多的客户，沉淀了很多的数据；同时也慢慢进入了发展缓慢期，公司规模越来越大，扩展新的业务越来越难，利润率也开始下降。偶然听到外界嘈杂的声音中传来的一些关键字：大数据时代，数字化转型，便将视线转向了沉淀了许久的数据，想从这一堆堆数据中挖点什么有价值的东西出来。   数据工程什么是数据工程我们先看看什么是软">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240716/image.1vyjgsxxt0.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240719/image.86tjiu2bbt.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240719/image.92q0ycab1r.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240719/image.26lde5yylh.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240719/image.361grfu29l.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240716/image.6pnecxbeaq.webp">
+<meta property="og:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240719/image.4xuftvkwoq.webp">
+<meta property="article:published_time" content="2025-01-01T10:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-12T06:50:37.248Z">
+<meta property="article:author" content="唐长老">
+<meta property="article:tag" content="Data Engineering">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240716/image.1vyjgsxxt0.webp">
+  
+  
+  
+  <title>数据工程与产品 - 唐长老的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"C9jETuLwvCO4tHwlcXW2ueCa-gzGzoHsz","app_key":"ujYxRlBDWb8IcQmRmFaoOqAi","server_url":"https://c9jetulw.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>唐长老的个人博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="数据工程与产品"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-01-01 10:00" pubdate>
+          2025年1月1日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          55 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">数据工程与产品</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="数据工程与产品"><a href="#数据工程与产品" class="headerlink" title="数据工程与产品"></a>数据工程与产品</h1><p>我们想象一下，有一家企业，经历了三年的从0到1野蛮生长期，取得了很大的成就，扩展了很多的客户，沉淀了很多的数据；<br>同时也慢慢进入了发展缓慢期，公司规模越来越大，扩展新的业务越来越难，利润率也开始下降。<br>偶然听到外界嘈杂的声音中传来的一些关键字：大数据时代，数字化转型，便将视线转向了沉淀了许久的数据，想从这一堆堆数据中挖点什么有价值的东西出来。  </p>
+<h2 id="数据工程"><a href="#数据工程" class="headerlink" title="数据工程"></a>数据工程</h2><h3 id="什么是数据工程"><a href="#什么是数据工程" class="headerlink" title="什么是数据工程"></a>什么是数据工程</h3><p>我们先看看什么是软件工程, 根据维基百科的定义，软件工程是：应用计算机科学理论和技术以及工程管理原则和方法，按预算和进度，实现满足用户要求的软件产品的定义、开发、和维护的工程或进行研究的学科。<br>简而言之就是，对某一特定需求进行系统化、模块化、规范化的一个过程。<br>数据工程也是如此，而数据工程的过程通常指的是：从数据的采集、存储、加工到应用的整个流程的工程化。  </p>
+<h3 id="数据工程经历了哪些时代"><a href="#数据工程经历了哪些时代" class="headerlink" title="数据工程经历了哪些时代"></a>数据工程经历了哪些时代</h3><p>其实我们对数据计算或者存储的需求从古代就产生了，古时候钱庄存钱取钱背后的用算盘记账和对账等过程，与现代的数据工程如出一辙。只是相对来说需求少，体量小。<br>而从计算机时代以来，数据就有了翻天覆地的变化。</p>
+<ul>
+<li><p>计算机时代<br>在80、90年代，随着计算机慢慢普及，以及Excel的诞生，而企业财务人员的主要工具，从便携式计算器变成了小型计算机，保存数据和计算数据的主要手段也变成了Excel。<br>这时候企业的用户还相对较少，产生的数据也没有特别的多，基本上一到两个财务人员就能完成公司所需的分析工作。</p>
+</li>
+<li><p>信息化时代<br>在2000年左右，网页数据库等信息技术逐渐在各行各业深入应用，企业的业务流程逐渐自动化，很多企业都构建了自己的EPR系统，并且产生了很多的数据保存在数据库中。<br>这个时候已经有很多BI项目和工具产生，主要是通过关系型数据库提供的计算能力，再加上web 页面的图表来做报表的展示。</p>
+</li>
+<li><p>大数据时代<br>大数据时代，企业的数据从 GB 增长到 TB 甚至 PB，数据爆发式增长，传统关系型数据库如 Mysql&#x2F;Oracle&#x2F;SQL Server 等不能满足海量数据的计算要求<br>这时候出现了很多分布式计算引擎如Hadoop&#x2F;Spark，还有一些MPP架构的数据库如GreenPlum&#x2F;DeepGreen&#x2F;TiDB&#x2F;Redshift等，这些组件的出现解决了海量数据的计算和存储的问题。<br>在吞吐量不是大问题之后，很多公司开始追求时效性，也就是从批处理往流处理发展。从离线数仓到实时数仓，从数据仓库到数据湖，也衍生了很多流批一体的架构如Lambda架构和Kappa架构等等。<br>从战略角度来看，从CRM 发展到 DMP，从DMP 到CDP，再到数据中台，再到 数据网格 DataMesh。在这个时代爆发出了各种让人眼花缭乱的产品或者解决方案。。<br>本篇文章我们就简单介绍一下这些跟数据息息相关的内容。</p>
+</li>
+</ul>
+<h3 id="数据工程包括哪些内容"><a href="#数据工程包括哪些内容" class="headerlink" title="数据工程包括哪些内容"></a>数据工程包括哪些内容</h3><p>有需求就会有市场，那我们先来看看都有哪些数据&#x2F;大数据相关的岗位  </p>
+<ul>
+<li>大数据平台开发工程师</li>
+<li>大数据开发工程师  </li>
+<li>数据开发工程师</li>
+<li>数据仓库工程师</li>
+<li>ETL工程师</li>
+<li>数据平台开发工程师</li>
+<li>数据分析师</li>
+<li>数据挖掘工程师</li>
+<li>数据科学家</li>
+<li>算法&#x2F;机器学习工程师 等</li>
+</ul>
+<h2 id="大数据开发平台"><a href="#大数据开发平台" class="headerlink" title="大数据开发平台"></a>大数据开发平台</h2><p>所有的软件都要运行在硬件之上，而大数据的计算也都要运行在各种大数据组件之上，各种大数据组件集成起来提供数据计算能力的这集合，就是大数据开发平台。<br>大数据平台为数据工程师或者数据分析师等提供数据的开发能力（如计算、存储、分析、安全审计、监控告警等），在此平台之上做各种各样的数据开发</p>
+<ul>
+<li>自建平台&#x2F;私有云<br>企业自己采购硬件、搭建机房、维护设备、维护软件等所有人力和经济成本，均由企业自己承担。<br>这里没有将自建平台和私有云做区分，是因为相对于企业自身来说，都需要投入相同的成本，区别只是这个工作是在不同的部门而已。<ul>
+<li>优点<ul>
+<li>网络只对本地开放，安全性高</li>
+<li>自定义程度高，灵活性高</li>
+<li>可控性更高，服务器类型，软件版本等可以深度自定义</li>
+<li>可以本地开发</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>运维成本高，需要为更多的基础设施付费，需要独立的运维团队</li>
+</ul>
+</li>
+<li>例子<ul>
+<li>自建 HUAWEI FusionInsight 集群</li>
+<li>自建 CDH 集群等</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>云平台<br>企业租赁云厂商提供的PaaS服务，在此服务之上直接做数据开发<ul>
+<li>优点<ul>
+<li>开箱即用，无需太多额外的运维成本</li>
+<li>按需付费，弹性扩容，无需在前期就投入大量的技术设施成本</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>安全性不如本地自建平台，服务器在公网上，需要定义防火墙规则来限制访问，极小可能存在被侵入的风险</li>
+<li>灵活性较差，PaaS提供的组件组合以及版本往往是固定的，并且几乎不可能使用到最新版本的开源组件</li>
+</ul>
+</li>
+<li>例子<ul>
+<li>AWS </li>
+<li>Azure </li>
+<li>阿里云 等</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="数据平台"><a href="#数据平台" class="headerlink" title="数据平台"></a>数据平台</h2><p>有了大数据开发平台，但测试这个平台只是具备了数据开发的能力，并没有提供任何数据。<br>用户想要做分析的时候还是需要经过繁琐的数据导入、数据清晰、建模等繁琐的过程，才能够真正地使用数据。<br>而数据平台的出现就是为了解决这些问题，为企业的数据分析挖掘、商业洞察、战略决策提供统一的、标准的、集成的、可靠的、易用的数据支撑服务。<br>常见的数据平台有数据仓库、数据湖、数据中台等，我们来看一看他们的异同。  </p>
+<h3 id="数据仓库"><a href="#数据仓库" class="headerlink" title="数据仓库"></a>数据仓库</h3><p>数据仓库是诞生比较早的数据平台，广义上来说它不是一种具体的技术，而是一种方法、一套架构。它可以构建在如MySql&#x2F;Oracle等传统的RDBMS上，也可以构建在如Hadoop、Hive等分布式架构之上。<br>数据仓库主要是针对特定主题的结构化的数据，SQL是主要语言，一般采用维度建模的方式，有清晰完善的层级结构，主要包括ODS层、DW层、ADS层。  </p>
+<h4 id="数据仓库分层"><a href="#数据仓库分层" class="headerlink" title="数据仓库分层"></a>数据仓库分层</h4><p>我们来看一张数据仓库层级图<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240716/image.1vyjgsxxt0.webp" srcset="/img/loading.gif" lazyload alt="数据仓库分层">  </p>
+<ul>
+<li><p>ODS 层<br>ODS(Operational Data Store)层又称贴源层, 是从外部系统将操作型数据导入平台之后的第一层，保存了操作型数据最原始的状态。<br>数据从这一层开始将各种外部数据集成在数据平台中，并且无需重复从外部数据中重复采集相同的数据。  </p>
+</li>
+<li><p>DW 层<br>DW(Data Warehouse)层，是数仓中最核心的一个层级，其中包含维度层 DIM, 数据明细层 DWD, 数据服务层 DWS</p>
+<ul>
+<li><p>DIM (Dimension)<br>维度表中主要用来存放一些具有确定含义、不会随着业务发生变化的的维度信息，如时间维度、地区维度、用户维度、商品维度<br>其中如用户维度、商品维度等，虽然不会随着业务发生快速变化，但可能会随着公司发展阶段，用户体量等因素而缓慢变化，因此又被细分为缓慢变化维度 SCD<br>应对 SCD 的手段有很多种，如常用的拉链表等，这里不过多介绍，更多请参考 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Slowly_changing_dimension">Wiki: Slowly changing dimension</a></p>
+</li>
+<li><p>DWD (Data Warehouse Details)<br>明细表中主要存放业务明细数据，在建模的过程中会做一些标准化处理，和维度退化处理：仅保留维度主键，在分析过程中，一个维度除了主键外，其他维度信息不参与计算，节省资源的同时，也可以让数据分析工作更加聚焦在业务，不受其他维度信息的干扰。   </p>
+</li>
+<li><p>DWS (Data Warehouse Service)<br>数据服务层按照部门的业务需求进行处理，产生的结果是针对特定主体的，如按雪花模型或星型模型做关联形成大宽表，便于进一步的数据分析，或按照特定维度(如以年&#x2F;月的时间维度)做聚合，形成相对公共的汇总数据等。</p>
+</li>
+</ul>
+</li>
+<li><p>ADS 层<br>ADS(Application Data Store)层，是面向应用的最顶层，上层应用直接从ADS层获取特定需求的结果数据，无需再在上层应用做额外的计算。<br>由于对接各种各样的上层应用，ADS层的数据也是多种多样，有按维度深度汇总的报表数据，便于BI团队做可视化；有按照业务属性将DWS表做深度关联，便于OLAP团队做即席查询，便于ML团队做数据挖掘；也有按指标模型构建的标签数据，方便运营团队做精细化运营，进准营销等等。<br>理想的情况，上层应用的每一个报表、或者其他依赖数据的服务，都对应着一张ADS层单独的表。</p>
+</li>
+</ul>
+<h4 id="离线数据仓库架构"><a href="#离线数据仓库架构" class="headerlink" title="离线数据仓库架构"></a>离线数据仓库架构</h4><p>数据仓库早期主要聚焦在离线计算上，数据窗口可能以月甚至年为单位，延迟多为T+1，即当天能看到前一天的数据即可。<br>我们来一张离线数据仓库架构图<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240719/image.86tjiu2bbt.webp" srcset="/img/loading.gif" lazyload alt="离线数据仓库架构"><br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240719/image.92q0ycab1r.webp" srcset="/img/loading.gif" lazyload alt="离线数据仓库架构"><br>HDFS 作为分布式文件存储系统，存储能力可以近似认为无限；<br>Spark 作为分布式内存计算框架，计算能力也可以通过扩展节点来提升，从而支持处理任意规模的数据；<br>Hive 作为数据仓库组件，是集中管理数据仓库模型中各种数据库和表的地方，其数据存储在HDFS上，计算引擎默认是MapReduce，也可用Spark进行替换，以提升处理性能。<br>离线数仓使用的技术决定了其能够支持大规模数据集的计算，也导致其具有相对较高的延迟，在准实时计算领域发挥受到限制。  </p>
+<h4 id="实时数据仓库架构"><a href="#实时数据仓库架构" class="headerlink" title="实时数据仓库架构"></a>实时数据仓库架构</h4><p>为了能让数据仓库的延迟更低，让业务洞察的反馈更快，实时数仓应运而生<br>我们再来看一张实时数仓架构图<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240719/image.26lde5yylh.webp" srcset="/img/loading.gif" lazyload alt="实时数据仓库架构"><br>实数数仓中替换了造成延迟的主要组件，将批计算引擎换成流计算引擎，将离线数据仓库组件换成更为实时的消息中间件<br>Kafka 作为流处理中的消息中间件，不同层级的不同的topic中保存不同属性的数据；<br>SparkStreaming 或 Flink 作为实时计算框架，能够让单个作业的延迟最低控制在秒级；<br>由于流式处理组件的特性，整个链路的延迟能控制在分钟级甚至秒级，但一般只处理增量数据，数据准确性相对不如离线计算。<br>为了同时满足批处理和流处理两个场景，也催化了一些流批一体的架构  </p>
+<h4 id="Lambda-架构"><a href="#Lambda-架构" class="headerlink" title="Lambda 架构"></a>Lambda 架构</h4><p>Lambda 架构是由离线数仓和实时数仓两部分组成的，从需求上同时满足了全量数据和增量数据的计算，并在准确性和效率上取得了平衡<br>先看一张Lambda架构图<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240719/image.361grfu29l.webp" srcset="/img/loading.gif" lazyload alt="Lambda架构"><br>同一个指标模型同时在Batch Layer和RealTime Layer中进行相同的逻辑，分别产生Batch Table 和 RealTime Table, Server Layer 层将两个用Union或其他方式进行合并，最为最终的ADS层。<br>Batch Layer中的数据为全量的数据，计算出来的结果更加准确，但最多只能显示昨天的数据；RealTime Layer 对今天的增量数据做补充，来提升数据的实时性，<br>但可能会由于数据的变更（比如交易关闭，订单取消等，需要对历史数据进行重新计算等场景）导致数据准确性不高, 需要再第二天的Batch Layer中重新计算，或可称之为数据校准。<br>因此在 Server Layer 将 Batch Table 昨天的数据和 RealTime Table 今天的数据进行合并， 从而兼顾实时性和准确性。<br>显而易见，Lambda架构的缺点也非常明显，就是需要同时维护两套相同业务逻辑的代码，并且技术栈都不太一样，导致开发成本、维护成本以及资源成本都相对较高。<br>为了解决 Lambda 架构下的痛点，LinkedIn 提出了 Kappa 架构  </p>
+<h4 id="Kappa-架构"><a href="#Kappa-架构" class="headerlink" title="Kappa 架构"></a>Kappa 架构</h4><p>Kappa 架构的核心思路是，删除Batch Layer，改进Lambda架构中的Speed Layer，使其能够支持历史数据的计算<br>从架构上采用了纯实时架构，架构图可以参考 <a href="#%E5%AE%9E%E6%97%B6%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93%E6%9E%B6%E6%9E%84">实时数据仓库架构</a> 章节<br>Kappa 架构认为在保证处理流程完善的前提下，增量计算的数据就是准确的，通常不需要对历史数据进行计算，只有很少的场景需要重算所有数据。<br>消息队列中的消息通常具有时效性，为了支持重新计算，需要从业务库或者备份库重新拉取全量数据。<br>并且为实时数仓中的Topic创建一个孪生Topic，用来保存计算历史数据时的中间层级的数据，避免污染运行中的作业模型。<br>在需要重新计算时，只需要启动一个额外的任务，将消费的偏移量设置为0，即可从头开始消费，从而重新计算所有的数据。<br>不难看出Kappa架构对消息中间件的要求非常高，需要很高的吞满足计算全量的数据；并且不像离线数据仓库那样，可以查询任意层级，实现灵活的OLAP需求；同时做数据治理的难度很大，比如数据血缘的管理，数据权限的管理等；</p>
+<h4 id="数据仓库痛点"><a href="#数据仓库痛点" class="headerlink" title="数据仓库痛点"></a>数据仓库痛点</h4><p>从上述的分层结构可以看出，不管是离线数仓还是实时数仓，都有着非常规范的结构，和较高的数据质量。<br>但缺点也比较明显，数仓团队需要为每一个特定主题的数据来在不同层级构建不同的表，从需求提出，到数据可用，所经历的周期相对较长。<br>数据基本上都是外部系统中的结构化数据，且都是先有需求再建模，整体提供的数据服务能力呈收敛的状态，相对不太容易能挖掘出更多的价值。<br>为了解决这些痛点，数据湖的架构慢慢发展起来。  </p>
+<h3 id="数据湖"><a href="#数据湖" class="headerlink" title="数据湖"></a>数据湖</h3><p>数据湖(Data Lake)名字也比较形象，顾名思义它可以容纳各种各样的数据，如结构化数据(Table)、半结构化数据(JSON、XML、HTML)以及非结构化数据(文件，音频，视频等)<br>数据湖通常会统一存储企业的所有数据，既包括采集后的原始数据，也包括转换后的数据，转换的层级可以很少（甚至为零），也可以按照严格的层级进行建模，故而数据仓库可以是数据湖的一个真子集，也就是常见的湖仓一体架构。<br>也因为可以不受严格的层级约束，数据入湖提供服务的技术成本和时间成本都大大降低，数据湖可以很轻松地整合各种各样的企业内部数据或者第三方数据，从而打破数据孤岛；同时视数据的情况可以按需进行数据转换，甚至在数据比较规范及安全的情况下，无需转换直接向下游提供数据服务，加速数据产生价值的时间。<br>我们再来看数据湖层级图<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240716/image.6pnecxbeaq.webp" srcset="/img/loading.gif" lazyload alt="数据湖层级图"><br>所以数据湖相对于数据仓库来说，可以面向任意业务，授权用户可以以任意速度，任意语言，访问数据湖的任意层级的数据。<br>广义上的数据湖是一套架构，一套体系，一套完整的方法论，而狭义上的数据湖则是由这套架构催化的存储数据的具体的技术组件。<br>离线数据仓库中的操作多为文件操作，仅支持读和写，不支持更新；即使可以通过逻辑层面实现更新的功能，本质上也是将整个文件删除和覆写，延迟相对较高，在准实时场景下容易成为性能瓶颈。<br>行业头部公司为了解决这些痛点，各自出现了自己的解决方案，比较知名的 Databrics 的 Dalta Lake，Uber 开源的 Hudi，Netflix 开源的 Iceberg，也就是常说的”数据湖三剑客”。<br>它们的核心都是定义了一种全新的表格式，即在对分布式文件系统之上做了一层封装，对文件进行标记，区分有效数据或已删除数据，通过引入一级索引文件和二级索引文件来对数据进行文件级的过滤和整合，从而实现快速ACID的语义。  </p>
+<h3 id="数据中台"><a href="#数据中台" class="headerlink" title="数据中台"></a>数据中台</h3><p>数据中台是企业级能力复用和赋能平台, 是数据驱动业务场景下孵化的产物, 以一种标准的、安全的、可靠的、统一的、共享的、解耦的、服务化的方式支持前端数据的应用。<br>数据是业务的一种展现形式，业务是产生数据的途径或者手段，当企业的业务足够复杂时，不同的业务部门就无可避免地就产生一些重复的业务模型，并产生重复的数据模型<br>比如阿里巴巴旗下有淘宝、天猫、咸鱼等等不同的产品，每个产品都会涉及到销售、订单、物流、支付等一系列业务。如果对每一个产品的每一个业务模型进行数据平台层面的建模，可想而知重复的工作非常之多，模型建设各自孤立，数据标准难以统一，并且想推出一个新产品时，这些重复的工作也不可避免地需要重做一次。<br>随着用户数量的增长、用户消费习惯的改变、以及市场的多变，传统的数据平台难以及时作出调整，无法快速为业务提供数据支撑，这时就需要一个能够快速响应市场变化的统一的企业级平台架构。<br>而也随着微服务的实践越来越成熟，我们不难想到，可以用微服务的思想来解决这类问题，将可复用的业务能力，按DDD（领域驱动设计）的原则对业务进行拆分和重组，形成一个统一的业务中台；再对产生的领域数据进行统一建模，产生的指标数据反哺到业务中去，即可形成一个统一的数据中台。<br>这也就是 DataMesh 的核心思路 (数据平台 + 领域驱动设计 + 微服务 &#x3D; 数据中台), 数据中台是道，是企业级战略思想；DataMesh 是法，是技术方法论；数据工程、微服务等是术, 是建设中台的手段；各项技术组件是器，是建设中台的工具。<br><img src="https://github.com/tangchenyang/picx-images-hosting/raw/master/20240719/image.4xuftvkwoq.webp" srcset="/img/loading.gif" lazyload alt="数据中台架构图"><br>可以看出，数据中台的建设成本高，周期长，不是一个或者几个部门能短时间就能完成的事情，它需要企业各个部门之间协作，对齐目标和愿景，从企业顶层视角进行统一设计和建设。<br>因此，在中小型企业，业务没有那么复杂，并且传统数仓或数据湖架构能够满足战略目标时，数据中台的建设反而会引入过高的技术&#x2F;架构复杂度和综合成本。<br>介绍完技术视角的数据平台，我们来看看业务视角下的数据产品。  </p>
+<h2 id="数据产品"><a href="#数据产品" class="headerlink" title="数据产品"></a>数据产品</h2><p>数据产品就是，能够为用户提供数据服务，产生直接或间接价值的应用或者系统。<br>前面所讲到的数据平台都能够为企业提供数据服务，也可以称之为数据产品，但是主要关注在技术视角，即如何利用技术来完成平台的建设，以满足业务需求。<br>我们来看看从业务视角的定位，有哪些数据产品  </p>
+<h3 id="CRM"><a href="#CRM" class="headerlink" title="CRM"></a>CRM</h3><p>CRM(Custom Relationship Management)系统，是管理客户数据的平台，向企业或营销方提供管理或分析上下游，客户渠道，营销情况等能力。  </p>
+<ul>
+<li>特点<ul>
+<li>管理上下游之间的数据</li>
+<li>高时效性：业务数据低延迟</li>
+</ul>
+</li>
+<li>使用场景<ul>
+<li>营销，销售等领域的客户管理、上下游&#x2F;供应链管理等</li>
+</ul>
+</li>
+<li>案例:<ul>
+<li>纷享销客CRM, Salesforce, Zuora</li>
+</ul>
+</li>
+</ul>
+<h3 id="DMP"><a href="#DMP" class="headerlink" title="DMP"></a>DMP</h3><p>DMP(Data Management Platform)，其定位主要是通过标签体系和圈选人群来提供精准投放的服务。   </p>
+<ul>
+<li>特点<ul>
+<li>管理用户标签数据</li>
+<li>匿名数据，只关心用户群体，不关心具体的用户</li>
+</ul>
+</li>
+<li>使用场景<ul>
+<li>电商平台，内容平台等定向推送</li>
+</ul>
+</li>
+<li>案例<ul>
+<li>淘宝-达摩盘, 抖音-巨量千川</li>
+</ul>
+</li>
+</ul>
+<h3 id="CDP"><a href="#CDP" class="headerlink" title="CDP"></a>CDP</h3><p>CDP(Custom Data Platform)系统，是客户数据的管理和分析平台，CDP包含CRM和DMP提供的能力，并通过对数据的分析和挖掘，来向企业提供精细化运营的能力。  </p>
+<ul>
+<li>特点<ul>
+<li>CRM + DMP + 精细化运营</li>
+</ul>
+</li>
+<li>使用场景<ul>
+<li>管理企业客户数据，上下游数据等</li>
+<li>广告投放</li>
+<li>分析和优化现有业务营收及投入成本，降本增效，实现精细化运营。</li>
+<li>商业洞察和战略规划</li>
+</ul>
+</li>
+<li>案例<ul>
+<li>各个企业的数据平台，企业年报背后的技术支撑平台</li>
+<li>GENE DataLake - MCDP</li>
+</ul>
+</li>
+</ul>
+<p>以上几个数据产品都只聚焦在数据能为用户带来的价值，通常产品经理需要考虑自己需要哪一类数据产品；<br>而其底层是使用传统数据库还是需要建设数据平台，则需要数据架构师来根据企业的战略规划来选择最适合的平台架构。 </p>
+<h2 id="数据工程的价值"><a href="#数据工程的价值" class="headerlink" title="数据工程的价值"></a>数据工程的价值</h2><h3 id="一般企业如何产生价值"><a href="#一般企业如何产生价值" class="headerlink" title="一般企业如何产生价值"></a>一般企业如何产生价值</h3><ul>
+<li>商贸企业：<br>经营模式主要为：采购 -&gt; 销售，特点是成本低，利润低，周期短，比如超市，服装经销等。  </li>
+<li>生产企业：<br>经营模式主要为：采购原材料 -&gt; 生产加工 -&gt; -&gt; 销售，特点是成本低，利润高，周期长；比如产品型公司，如护肤品厂商，服装厂商等。  </li>
+<li>互联网企业：<br>经营模式主要为：开发软件 -&gt; 销售软件&#x2F;提供服务； 按使用收费: 前期投入高，边际成本低，用户多，利润高；如电商平台，外卖平台，内容平台等。</li>
+</ul>
+<h3 id="数据产品如何产生价值"><a href="#数据产品如何产生价值" class="headerlink" title="数据产品如何产生价值"></a>数据产品如何产生价值</h3><ul>
+<li>直接价值<br>目前数据交易的法律法规还在逐步完善，能够直接提供价值的数据产品并不多<br>能够提供数据赋能的服务: 如CRM-SaaS，以及用于精准投放的DMP数据包等  </li>
+<li>间接价值<br>大部分数据产品都是间接提供价值，即通过数据分析和挖掘等手段，为上层应用提供分析或决策数据，数据从业务中来，反哺到业务中去，降本增效，优化现有业务，帮助上层应用实现价值增长。  <ul>
+<li>CRM: 精细化运营，提升运营效率，提升用户粘性，淘汰低ROI业务线等</li>
+<li>DMP: 精准营销, 广告投放</li>
+<li>CDP: CRM + DMP + More： 风险预警，数据分析和挖掘，ML + AI等。</li>
+</ul>
+</li>
+<li>创新价值<br>数据中台与其他数据产品相比，有其天然的优势，即通过数据资产或业务能力的复用和重组，来实现组合式创新，扩展新的业务线。<br>如盒马鲜生的诞生，通过复用和组合中台的用户、交易、支付等现有业务能力，形成了线上线下一体的新零售业务线。<br>反观盒马先生的经营模式，也基本上都是已有业务的不同形态的组合。也因为这一点，数据中台往往也只能实现组合式创新，很难做到颠覆式创新。</li>
+<li>颠覆式创新<br>在 ChatGPT 问世之前，ML和AI发展了很长一段时间，但是用户从中获益甚少，基本上处于玩具级定位，人工智能被广大用户戏称为人工智障。<br>随着算力的发展和数据的累积以及对算法的掌握，2022年ChatGPT问世之后，NLP(自然语言处理)领域有了全新的突破，同时也掀起了大模型的浪潮，图像领域、视频领域、音频领域等各种大模型爆发式出现。<br>庞大的数据体量以及对数据的应用，在接下来的人工智能时代的数据训练将会扮演非常重要的角色。<br>我们也来期待一下AI会给我们带来怎样的创新。</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Data-Engineering/" class="category-chain-item">Data Engineering</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Data-Engineering/" class="print-no-link">#Data Engineering</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>数据工程与产品</div>
+      <div>http://example.com/2025/01/01/Data-Project-And-Product/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>唐长老</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年1月1日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/05/13/elk/Manual-Install-Kibana/" title="Kibana 安装">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Kibana 安装</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/01/01/Manual-Install-Hadoop/" title="Hadoop 伪分布式安装">
+                        <span class="hidden-mobile">Hadoop 伪分布式安装</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"C9jETuLwvCO4tHwlcXW2ueCa-gzGzoHsz","appKey":"ujYxRlBDWb8IcQmRmFaoOqAi","path":"window.location.pathname","placeholder":"写留言","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
